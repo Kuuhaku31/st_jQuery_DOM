@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="UTF-8">
+  <title>lesson01</title>
+  <script src="https://code.jquery.com/jquery-4.0.0.min.js"></script>
+  <style>
+    .highlight
+    {
+      color: red;
+      font-size: 32px;
+    }
+
+  </style>
+</head>
+
+<body>
+
+  <h1 id="title">jQuery練習</h1>
+  <button id="btn">クリック</button>
+
+  <script>
+    $(function()
+    {
+      $("#btn").on("click", function()
+      {
+        let isHighlight = $("#title").hasClass("highlight");
+        if(isHighlight)
+        {
+          $("#title").removeClass("highlight");
+        }
+        else
+        {
+          $("#title").addClass("highlight");
+        }
+      });
+    });
+
+  </script>
+
+  <hr>
+
+  <button id="btn2">クリック</button>
+  <h1 id="title2">jQuery練習</h1>
+
+  <script>
+    $(function()
+    {
+      $("#btn2").on("click", function()
+      {
+        let isVisible = $("#title2").is(":visible");
+        if(isVisible)
+        {
+          $("#title2").fadeOut(1000);
+        }
+        else
+        {
+          $("#title2").fadeIn(1000);
+        }
+        // $("#title2").fadeOut(1000, function()
+        // {
+        //   // $(this).removeClass("highlight");
+        // });
+      });
+    });
+
+  </script>
+
+  <hr>
+
+  <h1 id="title3">jQuery練習</h1>
+  <script>
+    $(function()
+    {
+      $("#title3").on("click", function()
+      {
+        let isVisible = $("#title3").is(":visible");
+        if(isVisible)
+        {
+          $("#title3").fadeOut(1000);
+        }
+        else
+        {
+          $("#title3").fadeIn(1000);
+        }
+        // $("#title2").fadeOut(1000, function()
+        // {
+        //   // $(this).removeClass("highlight");
+        // });
+      });
+    });
+
+  </script>
+
+</body>
+
+</html>
