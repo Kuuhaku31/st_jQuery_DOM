@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <title>DOM vs jQuery 示例</title>
+
+    <!-- 引入 jQuery（CDN 方式） -->
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+
+    <style>
+        body {
+            font-family: Arial;
+            padding: 20px;
+        }
+        .box {
+            padding: 10px;
+            background-color: lightblue;
+            margin-top: 10px;
+        }
+        button {
+            margin-right: 10px;
+        }
+    </style>
+</head>
+<body>
+
+    <h2>DOM vs jQuery 示例</h2>
+
+    <button id="domBtn">使用原生 DOM 修改</button>
+    <button id="jqBtn">使用 jQuery 修改</button>
+
+    <div id="content" class="box">
+        原始内容
+    </div>
+
+    <script>
+        /* ==========================
+           1. 原生 DOM 操作
+        ========================== */
+
+        document.getElementById("domBtn").addEventListener("click", function () {
+            const element = document.getElementById("content");
+            element.innerText = "这是通过 原生 DOM 修改的内容";
+            element.style.backgroundColor = "lightgreen";
+        });
+
+
+        /* ==========================
+           2. jQuery 操作
+        ========================== */
+
+        $("#jqBtn").click(function () {
+            $("#content")
+                .text("这是通过 jQuery 修改的内容")
+                .css("background-color", "orange");
+        });
+
+    </script>
+
+</body>
+</html>

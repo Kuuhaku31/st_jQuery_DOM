@@ -1,0 +1,10 @@
+version: "3.9"
+
+services:
+  web:
+    image: nginx:alpine
+    container_name: st_jquery_dev
+    ports:
+      - "8080:80"
+    volumes:
+      - ./src:/usr/share/nginx/html
