@@ -1,0 +1,30 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <title>ISP01</title>
+    <script src="https://code.jquery.com/jquery-4.0.0.min.js"></script>
+    <style>
+      .highlight {
+        color: red;
+        font-size: 32px;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>jQuery練習</h1>
+    <button id="btn">クリック</button>
+    <button id="btn2">クリック 2</button>
+    <script>
+      $(function () {
+        $('#btn').on('click', function () {
+          // $('h1').hide();
+          $('h1').toggle();
+        });
+        $('#btn2').on('click', function () {
+          $('h1').addClass('highlight');
+        });
+      });
+    </script>
+  </body>
+</html>
