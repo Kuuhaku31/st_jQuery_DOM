@@ -1,75 +1,61 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="zh">
+  <head>
+    <meta charset="UTF-8" />
+    <title>DOM vs jQuery 示例</title>
 
-<head>
-  <meta charset="UTF-8">
-  <title>DOM vs jQuery 示例</title>
+    <!-- 引入 jQuery（CDN 方式） -->
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
 
-  <!-- 引入 jQuery（CDN 方式） -->
-  <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <style>
+      body {
+        font-family: Arial;
+        padding: 20px;
+      }
 
-  <style>
-    body
-    {
-      font-family: Arial;
-      padding: 20px;
-    }
+      .box {
+        padding: 10px;
+        background-color: lightblue;
+        margin-top: 10px;
+      }
 
-    .box
-    {
-      padding: 10px;
-      background-color: lightblue;
-      margin-top: 10px;
-    }
+      button {
+        margin-right: 10px;
+      }
+    </style>
+  </head>
 
-    button
-    {
-      margin-right: 10px;
-    }
+  <body>
+    <h2>DOM vs jQuery 示例</h2>
 
-  </style>
-</head>
+    <button id="domBtn">使用原生 DOM 修改</button>
+    <button id="jqBtn">使用 jQuery 修改</button>
 
-<body>
-  <h2>DOM vs jQuery 示例</h2>
+    <div id="content" class="box">原始内容</div>
 
-  <button id="domBtn">使用原生 DOM 修改</button>
-  <button id="jqBtn">使用 jQuery 修改</button>
-
-  <div id="content" class="box">
-    原始内容
-  </div>
-
-  <script>
-    /* ==========================
+    <script>
+      /* ==========================
            1. 原生 DOM 操作
         ========================== */
 
-    document.getElementById("domBtn").addEventListener("click", function()
-    {
-      const element = document.getElementById("content");
-      element.innerText = "这是通过 原生 DOM 修改的内容";
-      element.style.backgroundColor = "lightgreen";
-    });
+      document.getElementById("domBtn").addEventListener("click", function () {
+        const element = document.getElementById("content");
+        element.innerText = "这是通过 原生 DOM 修改的内容";
+        element.style.backgroundColor = "lightgreen";
+      });
 
-
-    /* ==========================
+      /* ==========================
        2. jQuery 操作
     ========================== */
 
-    $("#jqBtn").click(function()
-    {
-      $("#content")
-        .text("这是通过 jQuery 修改的内容")
-        .css("background-color", "orange");
-    });
+      $("#jqBtn").click(function () {
+        $("#content").text("这是通过 jQuery 修改的内容").css("background-color", "orange");
+      });
+    </script>
 
-  </script>
+    <hr />
 
-  <hr>
-
-  <a href="st01/lesson01.html">点击进入 jQuery 基础练习</a>
-
-</body>
-
+    <a href="st01/lesson01.html">点击进入 jQuery 基础练习01</a><br />
+    <a href="st02/isp02_template.html">点击进入 jQuery 基础练习02</a>
+  </body>
 </html>

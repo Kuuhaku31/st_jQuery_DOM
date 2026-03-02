@@ -1,0 +1,37 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <title>ISP02</title>
+    <script src="https://code.jquery.com/jquery-4.0.0.min.js"></script>
+    <style>
+      .box {
+        width: 100px;
+        height: 100px;
+        border: 1px solid #000;
+        display: inline-block;
+        margin: 10px;
+      }
+
+      .active {
+        background: orange;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="box"></div>
+    <div class="box"></div>
+    <div class="box"></div>
+    <script>
+      $(function () {
+        $(".box").on("click", function () {
+          let isActive = $(this).hasClass("active");
+
+          $(".box").removeClass("active");
+
+          if (!isActive) $(this).addClass("active");
+        });
+      });
+    </script>
+  </body>
+</html>
