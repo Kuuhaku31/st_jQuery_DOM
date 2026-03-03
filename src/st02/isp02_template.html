@@ -22,14 +22,25 @@
     <div class="box"></div>
     <div class="box"></div>
     <div class="box"></div>
+    <br />
+    <div class="box"></div>
+    <div class="box"></div>
+    <div class="box"></div>
+    <br />
+    <div class="box"></div>
+    <div class="box"></div>
+    <div class="box"></div>
     <script>
       $(function () {
         $(".box").on("click", function () {
-          let isActive = $(this).hasClass("active");
-
           $(".box").removeClass("active");
+          $(this).addClass("active");
+        });
+      });
 
-          if (!isActive) $(this).addClass("active");
+      $(function () {
+        $(".box").on("dblclick", function () {
+          $(this).toggleClass("active");
         });
       });
     </script>
