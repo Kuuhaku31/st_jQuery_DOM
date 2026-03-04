@@ -1,0 +1,61 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <title>ISP03</title>
+    <script src="https://code.jquery.com/jquery-4.0.0.min.js"></script>
+    <style>
+      .ok {
+        color: green;
+      }
+      .error {
+        color: red;
+      }
+    </style>
+  </head>
+  <body>
+    <input type="text" id="name" />
+    <button id="check">チェック</button>
+    <p id="result"></p>
+    <script>
+      // 点击按钮时的事件处理函数
+      $("#check").on("click", function () {
+        // 获取输入框的值，并去除两端的空白字符
+        var value = $("#name").val().trim();
+        $("#result").removeClass("ok error");
+
+        // 输入为空
+        if (value === "") {
+          value = "名前を入力してください";
+          $("#result").addClass("error");
+          $("#result").text(value);
+        }
+
+        // 输入长度小于5
+        else if (value.length < 5) {
+          value = "名前は5文字以上入力してください";
+          $("#result").addClass("error");
+          $("#result").text(value);
+        }
+
+        // 输入合法
+        else {
+          $("#result").addClass("ok");
+          $("#result").text("こんにちは " + value);
+        }
+
+        $("#name").val(""); // 清空输入框
+        $("#name").focus(); // 让输入框重新获得焦点，方便用户继续输入
+
+        console.log("Input value:", value);
+      });
+
+      // 通过 Enter 键触发按钮点击事件
+      $("#name").on("keyup", function (e) {
+        if (e.key === "Enter") {
+          $("#check").click(); // 触发按钮的点击事件
+        }
+      });
+    </script>
+  </body>
+</html>
