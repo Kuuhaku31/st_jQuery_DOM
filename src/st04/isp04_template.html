@@ -1,0 +1,83 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <title>ISP04</title>
+    <script src="https://code.jquery.com/jquery-4.0.0.min.js"></script>
+
+    <style>
+      .card {
+        border: 1px solid #000;
+        padding: 10px;
+        margin-top: 10px;
+      }
+
+      .typeA {
+        background: #cce5ff;
+      }
+
+      .typeB {
+        background: #ffe0e0;
+      }
+    </style>
+  </head>
+
+  <body>
+    <input type="text" id="name" placeholder="名前" />
+    <input type="number" id="age" placeholder="年齢" />
+
+    <button id="create">作成</button>
+    <button id="toggle">表示切替</button>
+
+    <div id="output"></div>
+
+    <script>
+      $(function () {
+        $("#create").on("click", function () {
+          let i_name = $("#name").val().trim();
+          let i_age = Number($("#age").val());
+
+          // 合法性确认
+          if (!i_name) {
+            alert("名前を入力してください");
+            return;
+          } else if (isNaN(i_age) || i_age < 0) {
+            alert("有効な年齢を入力してください");
+            return;
+          }
+
+          var user = {
+            name: i_name,
+            age: i_age,
+          };
+
+          render(user);
+
+          $("#name").val("");
+          $("#age").val("");
+          $("#name").focus();
+        });
+
+        $("#toggle").on("click", function () {
+          $("#output").toggle();
+        });
+      });
+
+      function render(user) {
+        let name = user.name;
+        let age = user.age;
+
+        // let card = $("<div class='card'>").text(`名前: ${name}, 年齢: ${age}`);
+        $("#output").html(`<div class="card"></div>`);
+        $(".card").text(`名前: ${name}, 年齢: ${age}`);
+
+        // 添加类型样式
+        if (age < 30) {
+          $(".card").addClass("typeA");
+        } else {
+          $(".card").addClass("typeB");
+        }
+      }
+    </script>
+  </body>
+</html>

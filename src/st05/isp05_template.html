@@ -1,0 +1,61 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <title>ISP05</title>
+
+    <script src="https://code.jquery.com/jquery-4.0.0.min.js"></script>
+
+    <style>
+      .card {
+        border: 1px solid #000;
+        padding: 5px;
+        margin: 5px;
+      }
+      .delete {
+        float: right;
+        color: red;
+        cursor: pointer;
+      }
+    </style>
+  </head>
+
+  <body>
+    <input type="text" id="text" />
+    <button id="add">追加</button>
+
+    <div id="list"></div>
+
+    <script>
+      // 追加按钮点击事件
+      $("#add").on("click", function () {
+        // 输入合法性确认
+        let input = $("#text").val().trim();
+        if (!input) {
+          alert("テキストを入力してください");
+          return;
+        }
+
+        let card = $("<div>").addClass("card").text(input);
+        let deleteBtn = $("<button>").addClass("delete").text("削除");
+        card.append(deleteBtn);
+        $("#list").append(card);
+
+        // 输入框清空并聚焦
+        $("#text").val("").focus();
+      });
+
+      // 事件委托：删除按钮点击事件
+      $("#list").on("click", ".delete", function () {
+        $(this).parent().remove();
+      });
+
+      // 通过 Enter 键触发按钮点击事件
+      $("#text").on("keyup", function (e) {
+        if (e.key === "Enter") {
+          $("#add").click(); // 触发按钮的点击事件
+        }
+      });
+    </script>
+  </body>
+</html>
