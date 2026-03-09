@@ -17,29 +17,36 @@
         color: red;
         cursor: pointer;
       }
+      .ok {
+        color: green;
+      }
+      .error {
+        color: red;
+      }
     </style>
   </head>
 
   <body>
     <input type="text" id="text" />
     <button id="add">追加</button>
-
+    <div id="output"></div>
     <div id="list"></div>
-
     <script>
       // 追加按钮点击事件
       $("#add").on("click", function () {
         // 输入合法性确认
         let input = $("#text").val().trim();
+        $("#output").removeClass("ok error").text(""); // 清除之前的消息
         if (!input) {
-          alert("テキストを入力してください");
-          return;
-        }
+          $("#output").text("有効な入力をしてください").addClass("error");
+        } else {
+          let card = $("<div>").addClass("card").text(input); // 创建卡片元素
+          let deleteBtn = $("<button>").addClass("delete").text("削除"); // 创建删除按钮
+          card.append(deleteBtn); // 将删除按钮添加到卡片中
+          $("#list").append(card); // 将卡片添加到列表中
 
-        let card = $("<div>").addClass("card").text(input);
-        let deleteBtn = $("<button>").addClass("delete").text("削除");
-        card.append(deleteBtn);
-        $("#list").append(card);
+          $("#output").text("カードが追加されました").addClass("ok");
+        }
 
         // 输入框清空并聚焦
         $("#text").val("").focus();

@@ -1,0 +1,59 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <title>ISP06</title>
+
+    <script src="https://code.jquery.com/jquery-4.0.0.min.js"></script>
+
+    <style>
+      .card {
+        border: 1px solid #000;
+        padding: 8px;
+        margin: 5px;
+        width: 120px;
+      }
+    </style>
+  </head>
+
+  <body>
+    <input type="text" id="name" placeholder="名前" />
+    <button id="add">追加</button>
+
+    <div id="list"></div>
+
+    <script>
+      $(function () {
+        var users = [];
+
+        $("#add").click(function () {
+          var name = $("#name").val().trim();
+          if (name) {
+            users.push(name);
+            render(users);
+            $("#name").val(""); // 清空输入框
+          }
+        });
+
+        // 通过 Enter 键触发按钮点击事件
+        $("#name").keypress(function (e) {
+          if (e.which === 13) {
+            $("#add").click();
+          }
+        });
+
+        render(users);
+      });
+
+      function render(users) {
+        $("#list").html(""); // 清空列表
+
+        // 遍历用户数组，创建卡片并添加到列表中
+        for (var i = 0; i < users.length; i++) {
+          var card = $("<div>").addClass("card").text(users[i]);
+          $("#list").append(card);
+        }
+      }
+    </script>
+  </body>
+</html>
