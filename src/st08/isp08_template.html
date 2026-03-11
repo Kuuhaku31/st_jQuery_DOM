@@ -21,7 +21,7 @@
     </style>
   </head>
   <body>
-    <input type="text" id="name" placeholder="名前" />
+    <input type="text" id="name" placeholder="名前" value="プレイヤー" />
     <button class="hand" data-hand="✊">✊</button>
     <button class="hand" data-hand="✌️">✌️</button>
     <button class="hand" data-hand="✋">✋</button>
@@ -39,46 +39,69 @@
       const TEXT_LOSE = "負け";
       const TEXT_DRAW = "引き分け";
 
+      const CPU_HANDS = [TEXT_ROCK, TEXT_SCISSORS, TEXT_PAPER];
+      const CPU_HANDS_PRO = [TEXT_ROCK, TEXT_SCISSORS, TEXT_PAPER, TEXT_GUN]; // 强化 CPU
+
+      // 数据
+      let history = []; // 历史记录数组
+
+      // 分数信息对象
+      let score_info = {
+        win_count: 0, // 胜利次数
+        lost_count: 0, // 失败次数
+        draw_count: 0, // 平局次数
+        total_count: 0, // 总对局次数
+        win_rate: 0, // 胜率
+        combo_count: 0, // 连击次数
+      };
+
+      // 页面加载完成后执行的函数
       $(function () {
-        let history = [];
-        let CPU_hands = [TEXT_ROCK, TEXT_SCISSORS, TEXT_PAPER];
-        let comboCount = 0; // 连击次数
-
-        $("#name").val("プレイヤー");
-        render(history);
-
         // 按钮点击事件
         $(".hand").click(function () {
-          let playerHand = $(this).data("hand");
+          let player_hand = $(this).data("hand"); // 获取玩家选择的手势
+          let cpu_hand = CPU_HANDS[Math.floor(Math.random() * CPU_HANDS.length)]; // 随机生成 CPU 的手势
 
-          let cpuHand = CPU_hands[Math.floor(Math.random() * CPU_hands.length)];
-          let result = judge(playerHand, cpuHand);
+          // 获取对决结果
+          let result = judge(player_hand, cpu_hand);
 
-          // 如果胜利
-          if (result === TEXT_WIN) {
-            comboCount++; // 连击次数加1
-            if (comboCount === 3) {
-              alert("連撃3回達成！");
-            }
-          } else {
-            comboCount = 0; // 其他结果，连击次数重置
+          // 分析结果
+          switch (result) {
+            case TEXT_WIN:
+              score_info.win_count++;
+              score_info.combo_count++;
+              if (score_info.combo_count === 3) {
+                alert("3連勝達成！おめでとう！");
+              }
+              break;
+            case TEXT_LOSE:
+              score_info.lost_count++;
+              score_info.combo_count = 0; // 其他结果，连击次数重置
+              break;
+            case TEXT_DRAW:
+              score_info.draw_count++;
+              score_info.combo_count = 0; // 其他结果，连击次数重置
+              break;
           }
+          score_info.total_count++;
+          // 计算胜率
+          score_info.win_rate =
+            score_info.win_count / (score_info.total_count > 0 ? score_info.total_count : 1);
 
           // 保存到历史记录
           history.push({
             player_name: $("#name").val() || "プレイヤー",
-            player: playerHand,
-            cpu: cpuHand,
+            player: player_hand,
+            cpu: cpu_hand,
             result: result,
           });
-
           // 如果历史记录超过10条，删除最早的一条
           if (history.length > 10) {
             history.shift();
           }
 
           // 结果显示
-          render(history);
+          render();
         });
 
         // 删除按钮点击事件
@@ -87,29 +110,43 @@
           history.splice(index, 1); // 根据索引删除历史记录
           render(history);
         });
+
+        // 初始渲染
+        render();
       });
 
       function judge(player, cpu) {
-        // 特例
-        if (player === TEXT_GUN) {
-          return TEXT_WIN;
-        }
-
-        if (player === cpu) {
-          return TEXT_DRAW;
-        }
-
-        if (
-          (player === TEXT_ROCK && cpu === TEXT_SCISSORS) ||
-          (player === TEXT_SCISSORS && cpu === TEXT_PAPER) ||
-          (player === TEXT_PAPER && cpu === TEXT_ROCK)
-        ) {
-          return TEXT_WIN;
-        }
-        return TEXT_LOSE;
+        // 定义一个对决结果表，根据玩家和 CPU 的选择来确定结果
+        const judge_table = {
+          [TEXT_ROCK]: {
+            [TEXT_ROCK]: TEXT_DRAW,
+            [TEXT_SCISSORS]: TEXT_WIN,
+            [TEXT_PAPER]: TEXT_LOSE,
+            [TEXT_GUN]: TEXT_LOSE,
+          },
+          [TEXT_SCISSORS]: {
+            [TEXT_ROCK]: TEXT_LOSE,
+            [TEXT_SCISSORS]: TEXT_DRAW,
+            [TEXT_PAPER]: TEXT_WIN,
+            [TEXT_GUN]: TEXT_LOSE,
+          },
+          [TEXT_PAPER]: {
+            [TEXT_ROCK]: TEXT_WIN,
+            [TEXT_SCISSORS]: TEXT_LOSE,
+            [TEXT_PAPER]: TEXT_DRAW,
+            [TEXT_GUN]: TEXT_LOSE,
+          },
+          [TEXT_GUN]: {
+            [TEXT_ROCK]: TEXT_WIN,
+            [TEXT_SCISSORS]: TEXT_WIN,
+            [TEXT_PAPER]: TEXT_WIN,
+            [TEXT_GUN]: TEXT_DRAW,
+          },
+        };
+        return judge_table[player][cpu];
       }
 
-      function render(history) {
+      function render() {
         // 清空历史记录显示
         $("#history").html("");
 
@@ -123,36 +160,36 @@
 
           // 新建一个<li>元素来显示每一局的结果
           let card = $("<li>");
-          // 设置文本内容，包括玩家名称、玩家手势、CPU手势和结果
-          card.text(
-            recode.player_name +
-              " " +
-              recode.player +
-              "VS" +
-              recode.cpu +
-              " CPU => " +
-              recode.result,
-          );
-          // 添加一个删除按钮，并绑定数据索引以便删除时使用
-          // i 表示当前记录在历史记录数组中的索引，添加到删除按钮的 data-index 属性中，以便在点击删除按钮时能够知道要删除哪一条记录
-          card.append($("<button>").text("削除").addClass("delete").data("index", i));
-
-          // 结果为胜利
-          if (recode.result === TEXT_WIN) {
-            score.win++; // 胜利次数加1
-            card.addClass("win").addClass("win");
+          {
+            // 设置文本内容，包括玩家名称、玩家手势、CPU手势和结果
+            card.text(
+              recode.player_name +
+                " " +
+                recode.player +
+                "VS" +
+                recode.cpu +
+                " CPU => " +
+                recode.result,
+            );
+            // 添加一个删除按钮，并绑定数据索引以便删除时使用
+            // i 表示当前记录在历史记录数组中的索引，添加到删除按钮的 data-index 属性中，以便在点击删除按钮时能够知道要删除哪一条记录
+            card.append($("<button>").text("削除").addClass("delete").data("index", i));
           }
 
-          // 结果为失败
-          else if (recode.result === TEXT_LOSE) {
-            score.lose++;
-            card.addClass("lose").addClass("lose");
-          }
-
-          // 结果为平局
-          else if (recode.result === TEXT_DRAW) {
-            score.draw++;
-            card.addClass("draw").addClass("draw");
+          // 根据结果设置不同的样式，并更新分数对象
+          switch (recode.result) {
+            case TEXT_WIN:
+              card.addClass("win");
+              score.win++;
+              break;
+            case TEXT_LOSE:
+              card.addClass("lose");
+              score.lose++;
+              break;
+            case TEXT_DRAW:
+              card.addClass("draw");
+              score.draw++;
+              break;
           }
 
           // 将结果添加到历史记录列表中
@@ -162,14 +199,18 @@
         // 更新分数显示
         $("#score").text(
           "勝ち: " +
-            score.win +
-            ", 負け: " +
-            score.lose +
-            ", 引き分け: " +
-            score.draw +
-            ", 勝率: " +
-            ((score.win / history.length) * 100).toFixed(2) +
-            "%",
+            score_info.win_count +
+            "/ 負け: " +
+            score_info.lost_count +
+            "/ 引き分け: " +
+            score_info.draw_count +
+            "/ 総回数: " +
+            score_info.total_count +
+            "/ 勝率: " +
+            (score_info.win_rate * 100).toFixed(2) +
+            "%" +
+            "/ 連勝: " +
+            score_info.combo_count,
         );
       }
     </script>
