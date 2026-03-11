@@ -18,6 +18,9 @@
       .gun_button {
         background-color: rgba(255, 213, 0, 0.975);
       }
+      .magic_button {
+        background-color: rgba(128, 0, 128, 0.975);
+      }
     </style>
   </head>
   <body>
@@ -26,7 +29,13 @@
     <button class="hand" data-hand="✌️">✌️</button>
     <button class="hand" data-hand="✋">✋</button>
     <button class="hand gun_button" data-hand="🔫">🔫</button>
+    <button class="hand magic_button" data-hand="🪄">🪄</button>
+    <!-- 切换CPU强化模式 -->
+    <input type="checkbox" id="cpu_pro_toggle" />
+    <label for="cpu_pro_toggle">CPU強化モード</label>
+    <hr />
     <h3 id="score"></h3>
+    <p id="message"></p>
     <ul id="history"></ul>
     <script>
       // 定义常量
@@ -34,13 +43,53 @@
       const TEXT_SCISSORS = "✌️";
       const TEXT_PAPER = "✋";
       const TEXT_GUN = "🔫";
+      const TEXT_MAGIC = "🪄";
 
       const TEXT_WIN = "勝ち";
       const TEXT_LOSE = "負け";
       const TEXT_DRAW = "引き分け";
 
       const CPU_HANDS = [TEXT_ROCK, TEXT_SCISSORS, TEXT_PAPER];
-      const CPU_HANDS_PRO = [TEXT_ROCK, TEXT_SCISSORS, TEXT_PAPER, TEXT_GUN]; // 强化 CPU
+      const CPU_HANDS_PRO = [TEXT_ROCK, TEXT_SCISSORS, TEXT_PAPER, TEXT_GUN, TEXT_MAGIC]; // 强化 CPU
+
+      // 定义一个对决结果表，根据玩家和 CPU 的选择来确定结果
+      const JUDGE_TABLE = {
+        [TEXT_ROCK]: {
+          [TEXT_ROCK]: TEXT_DRAW,
+          [TEXT_SCISSORS]: TEXT_WIN,
+          [TEXT_PAPER]: TEXT_LOSE,
+          [TEXT_GUN]: TEXT_LOSE,
+          [TEXT_MAGIC]: TEXT_WIN,
+        },
+        [TEXT_SCISSORS]: {
+          [TEXT_ROCK]: TEXT_LOSE,
+          [TEXT_SCISSORS]: TEXT_DRAW,
+          [TEXT_PAPER]: TEXT_WIN,
+          [TEXT_GUN]: TEXT_LOSE,
+          [TEXT_MAGIC]: TEXT_WIN,
+        },
+        [TEXT_PAPER]: {
+          [TEXT_ROCK]: TEXT_WIN,
+          [TEXT_SCISSORS]: TEXT_LOSE,
+          [TEXT_PAPER]: TEXT_DRAW,
+          [TEXT_GUN]: TEXT_LOSE,
+          [TEXT_MAGIC]: TEXT_WIN,
+        },
+        [TEXT_GUN]: {
+          [TEXT_ROCK]: TEXT_WIN,
+          [TEXT_SCISSORS]: TEXT_WIN,
+          [TEXT_PAPER]: TEXT_WIN,
+          [TEXT_GUN]: TEXT_DRAW,
+          [TEXT_MAGIC]: TEXT_LOSE,
+        },
+        [TEXT_MAGIC]: {
+          [TEXT_ROCK]: TEXT_LOSE,
+          [TEXT_SCISSORS]: TEXT_LOSE,
+          [TEXT_PAPER]: TEXT_LOSE,
+          [TEXT_GUN]: TEXT_WIN,
+          [TEXT_MAGIC]: TEXT_DRAW,
+        },
+      };
 
       // 数据
       let history = []; // 历史记录数组
@@ -59,20 +108,25 @@
       $(function () {
         // 按钮点击事件
         $(".hand").click(function () {
+          let is_cpu_pro = $("#cpu_pro_toggle").is(":checked"); // 获取 CPU 强化模式的状态
+          let cpu_hands = is_cpu_pro ? CPU_HANDS_PRO : CPU_HANDS; // 根据标志选择 CPU 的手势列表
+
           let player_hand = $(this).data("hand"); // 获取玩家选择的手势
-          let cpu_hand = CPU_HANDS[Math.floor(Math.random() * CPU_HANDS.length)]; // 随机生成 CPU 的手势
+          let cpu_hand = cpu_hands[Math.floor(Math.random() * cpu_hands.length)]; // 随机生成 CPU 的手势
+
+          // 如果是强化模式，50% 的概率让 CPU 选择一个能赢的手势
+          if (is_cpu_pro && Math.random() < 0.5) {
+            cpu_hand = let_cpu_win(player_hand, cpu_hand); // 获取一个能让 CPU 获胜的手势
+          }
 
           // 获取对决结果
-          let result = judge(player_hand, cpu_hand);
+          let result = JUDGE_TABLE[player_hand][cpu_hand];
 
           // 分析结果
           switch (result) {
             case TEXT_WIN:
               score_info.win_count++;
               score_info.combo_count++;
-              if (score_info.combo_count === 3) {
-                alert("3連勝達成！おめでとう！");
-              }
               break;
             case TEXT_LOSE:
               score_info.lost_count++;
@@ -86,11 +140,11 @@
           score_info.total_count++;
           // 计算胜率
           score_info.win_rate =
-            score_info.win_count / (score_info.total_count > 0 ? score_info.total_count : 1);
+            score_info.total_count > 0 ? score_info.win_count / score_info.total_count : 0;
 
           // 保存到历史记录
           history.push({
-            player_name: $("#name").val() || "プレイヤー",
+            player_name: $("#name").val().trim() || "プレイヤー",
             player: player_hand,
             cpu: cpu_hand,
             result: result,
@@ -115,35 +169,14 @@
         render();
       });
 
-      function judge(player, cpu) {
-        // 定义一个对决结果表，根据玩家和 CPU 的选择来确定结果
-        const judge_table = {
-          [TEXT_ROCK]: {
-            [TEXT_ROCK]: TEXT_DRAW,
-            [TEXT_SCISSORS]: TEXT_WIN,
-            [TEXT_PAPER]: TEXT_LOSE,
-            [TEXT_GUN]: TEXT_LOSE,
-          },
-          [TEXT_SCISSORS]: {
-            [TEXT_ROCK]: TEXT_LOSE,
-            [TEXT_SCISSORS]: TEXT_DRAW,
-            [TEXT_PAPER]: TEXT_WIN,
-            [TEXT_GUN]: TEXT_LOSE,
-          },
-          [TEXT_PAPER]: {
-            [TEXT_ROCK]: TEXT_WIN,
-            [TEXT_SCISSORS]: TEXT_LOSE,
-            [TEXT_PAPER]: TEXT_DRAW,
-            [TEXT_GUN]: TEXT_LOSE,
-          },
-          [TEXT_GUN]: {
-            [TEXT_ROCK]: TEXT_WIN,
-            [TEXT_SCISSORS]: TEXT_WIN,
-            [TEXT_PAPER]: TEXT_WIN,
-            [TEXT_GUN]: TEXT_DRAW,
-          },
-        };
-        return judge_table[player][cpu];
+      // 返回可以让 CPU 获胜的手势（强化模式下，CPU 可能选择枪或魔法）
+      function let_cpu_win(player, cpu) {
+        for (let hand in JUDGE_TABLE[player]) {
+          if (JUDGE_TABLE[player][hand] === TEXT_LOSE) {
+            return hand; // 返回可以让 CPU 获胜的手势
+          }
+        }
+        return cpu; // 如果没有找到合适的手势，返回原来的 CPU 手势
       }
 
       function render() {
@@ -212,6 +245,13 @@
             "/ 連勝: " +
             score_info.combo_count,
         );
+
+        // 3连胜时，显示特殊消息
+        if (score_info.combo_count === 3) {
+          $("#message").text("おめでとう！3連勝達成！").css("color", "blue");
+        } else {
+          $("#message").text("");
+        }
       }
     </script>
   </body>
