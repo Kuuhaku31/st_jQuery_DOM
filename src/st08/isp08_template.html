@@ -91,21 +91,10 @@
         },
       };
 
-      // 数据
-      let history = []; // 历史记录数组
-
-      // 分数信息对象
-      let score_info = {
-        win_count: 0, // 胜利次数
-        lost_count: 0, // 失败次数
-        draw_count: 0, // 平局次数
-        total_count: 0, // 总对局次数
-        win_rate: 0, // 胜率
-        combo_count: 0, // 连击次数
-      };
-
       // 页面加载完成后执行的函数
       $(function () {
+        let history = []; // 历史记录数组
+
         // 按钮点击事件
         $(".hand").click(function () {
           let is_cpu_pro = $("#cpu_pro_toggle").is(":checked"); // 获取 CPU 强化模式的状态
@@ -122,26 +111,6 @@
           // 获取对决结果
           let result = JUDGE_TABLE[player_hand][cpu_hand];
 
-          // 分析结果
-          switch (result) {
-            case TEXT_WIN:
-              score_info.win_count++;
-              score_info.combo_count++;
-              break;
-            case TEXT_LOSE:
-              score_info.lost_count++;
-              score_info.combo_count = 0; // 其他结果，连击次数重置
-              break;
-            case TEXT_DRAW:
-              score_info.draw_count++;
-              score_info.combo_count = 0; // 其他结果，连击次数重置
-              break;
-          }
-          score_info.total_count++;
-          // 计算胜率
-          score_info.win_rate =
-            score_info.total_count > 0 ? score_info.win_count / score_info.total_count : 0;
-
           // 保存到历史记录
           history.push({
             player_name: $("#name").val().trim() || "プレイヤー",
@@ -155,7 +124,7 @@
           }
 
           // 结果显示
-          render();
+          render(history);
         });
 
         // 删除按钮点击事件
@@ -166,7 +135,7 @@
         });
 
         // 初始渲染
-        render();
+        render(history);
       });
 
       // 返回可以让 CPU 获胜的手势（强化模式下，CPU 可能选择枪或魔法）
@@ -179,7 +148,7 @@
         return cpu; // 如果没有找到合适的手势，返回原来的 CPU 手势
       }
 
-      function render() {
+      function render(history) {
         // 清空历史记录显示
         $("#history").html("");
 
@@ -232,23 +201,25 @@
         // 更新分数显示
         $("#score").text(
           "勝ち: " +
-            score_info.win_count +
+            score.win +
             "/ 負け: " +
-            score_info.lost_count +
+            score.lose +
             "/ 引き分け: " +
-            score_info.draw_count +
-            "/ 総回数: " +
-            score_info.total_count +
+            score.draw +
             "/ 勝率: " +
-            (score_info.win_rate * 100).toFixed(2) +
-            "%" +
-            "/ 連勝: " +
-            score_info.combo_count,
+            (history.length > 0 ? ((score.win / history.length) * 100).toFixed(2) : "0.00") +
+            "%",
         );
 
         // 3连胜时，显示特殊消息
-        if (score_info.combo_count === 3) {
-          $("#message").text("おめでとう！3連勝達成！").css("color", "blue");
+        // 查看历史记录数组最后三条记录，如果它们的结果都是胜利，则显示特殊消息
+        if (
+          history.length >= 3 &&
+          history[history.length - 1].result === TEXT_WIN &&
+          history[history.length - 2].result === TEXT_WIN &&
+          history[history.length - 3].result === TEXT_WIN
+        ) {
+          $("#message").text("今絶賛連勝中！").addClass("win").removeClass("lose draw");
         } else {
           $("#message").text("");
         }
