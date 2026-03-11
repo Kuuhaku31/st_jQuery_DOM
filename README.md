@@ -119,3 +119,11 @@ docker compose up -d --build
 ---
 
 访问: http://localhost:8080
+
+## js 语法
+
+let var const 区别
+
+- **var**：函数作用域，允许重复声明和修改。
+- **let**：块作用域，不允许重复声明，但允许修改。
+- **const**：块作用域，不允许重复声明和修改，必须初始化。
