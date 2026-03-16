@@ -34,6 +34,11 @@
     <input type="checkbox" id="cpu_pro_toggle" />
     <label for="cpu_pro_toggle">CPU強化モード</label>
     <hr />
+    <button id="showAll">全表示</button>
+    <button id="showWin">勝ちのみ</button>
+    <button id="sortDefault">通常順</button>
+    <button id="sortWin">勝ち順</button>
+    <hr />
     <h3 id="score"></h3>
     <p id="message"></p>
     <ul id="history"></ul>
@@ -91,9 +96,29 @@
         },
       };
 
+      let currentSort = "default";
+      let currentFilter = "all";
+
       // 页面加载完成后执行的函数
       $(function () {
         let history = []; // 历史记录数组
+
+        $("#showAll").click(function () {
+          currentFilter = "all";
+          render(history);
+        });
+        $("#showWin").click(function () {
+          currentFilter = "win";
+          render(history);
+        });
+        $("#sortDefault").click(function () {
+          currentSort = "default";
+          render(history);
+        });
+        $("#sortWin").click(function () {
+          currentSort = "win";
+          render(history);
+        });
 
         // 按钮点击事件
         $(".hand").click(function () {
@@ -121,12 +146,8 @@
           });
           // 如果历史记录超过10条，删除最早的一条
           if (history.length > 10) {
-            // history.shift();
-            let earliest_time = Math.min(...history.map((record) => record.time_stamp)); // 找到最早的时间戳
-            history = history.filter((record) => record.time_stamp !== earliest_time); // 删除最早的记录
+            history.shift();
           }
-          // 排序历史记录
-          history = sortHistory(history);
 
           // 结果显示
           render(history);
@@ -143,13 +164,40 @@
         render(history);
       });
 
-      // 排序历史记录
-      function sortHistory(history) {
+      function getRenderData(history) {
+        // 创建一个新的数组来渲染历史记录，避免直接修改原始历史记录数组
+        let display_data = history.slice();
+
+        // 数据排序
+        switch (currentSort) {
+          case "win":
+            display_data.sort(sortHistory);
+            break;
+          case "default":
+          default:
+            // 不排序，保持原始顺序
+            break;
+        }
+
+        // 数据过滤
+        switch (currentFilter) {
+          case "win":
+            display_data = display_data.filter((item) => item.result === TEXT_WIN);
+            break;
+          case "all":
+          default:
+            // 不过滤，显示全部
+            break;
+        }
+
+        return display_data;
+      }
+
+      // 排序历史记录的函数，按照胜负结果排序，胜利 < 失败 < 引き分け
+      function sortHistory(itemA, itemB) {
         // 按照胜负结果排序 胜利 < 失败
-        return history.sort((a, b) => {
-          const result_order = { [TEXT_WIN]: 1, [TEXT_DRAW]: 2, [TEXT_LOSE]: 3 };
-          return result_order[a.result] - result_order[b.result];
-        });
+        const result_order = { [TEXT_WIN]: 1, [TEXT_DRAW]: 2, [TEXT_LOSE]: 3 };
+        return result_order[itemA.result] - result_order[itemB.result];
       }
 
       // 根据玩家和 CPU 的选择来确定结果的函数
@@ -244,10 +292,12 @@
       function render(history) {
         $("#history").html(""); // 清空历史记录显示
 
+        let display_data = getRenderData(history); // 获取要渲染的数据
+
         // 遍历历史记录，计算分数并生成HTML
         let score = { win: 0, lose: 0, draw: 0, total: history.length };
-        for (let i = 0; i < history.length; i++) {
-          let recode = history[i]; // 获取当前记录
+        for (let i = 0; i < display_data.length; i++) {
+          let recode = display_data[i]; // 获取当前记录
 
           // 根据结果设置不同的样式，并更新分数对象
           switch (recode.result) {
