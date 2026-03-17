@@ -96,28 +96,31 @@
         },
       };
 
-      let currentSort = "default";
-      let currentFilter = "all";
-
       // 页面加载完成后执行的函数
       $(function () {
-        let history = []; // 历史记录数组
+        // 定义一个对象来保存渲染所需的参数，包括历史记录、当前排序方式和当前过滤方式
+        let renderArgs = {
+          history: [], // 历史记录数组
+          currentSort: "default", // 当前排序方式，默认为 "default"
+          currentFilter: "all", // 当前过滤方式，默认为 "all"
+        };
 
+        // 过滤和排序按钮点击事件
         $("#showAll").click(function () {
-          currentFilter = "all";
-          render(history);
+          renderArgs.currentFilter = "all";
+          render(renderArgs);
         });
         $("#showWin").click(function () {
-          currentFilter = "win";
-          render(history);
+          renderArgs.currentFilter = "win";
+          render(renderArgs);
         });
         $("#sortDefault").click(function () {
-          currentSort = "default";
-          render(history);
+          renderArgs.currentSort = "default";
+          render(renderArgs);
         });
         $("#sortWin").click(function () {
-          currentSort = "win";
-          render(history);
+          renderArgs.currentSort = "win";
+          render(renderArgs);
         });
 
         // 按钮点击事件
@@ -137,7 +140,7 @@
           let result = judge(player_hand, cpu_hand);
 
           // 保存到历史记录
-          history.push({
+          renderArgs.history.push({
             player_name: $("#name").val().trim() || "プレイヤー",
             player: player_hand,
             cpu: cpu_hand,
@@ -145,31 +148,31 @@
             time_stamp: Date.now(),
           });
           // 如果历史记录超过10条，删除最早的一条
-          if (history.length > 10) {
-            history.shift();
+          if (renderArgs.history.length > 10) {
+            renderArgs.history.shift();
           }
 
           // 结果显示
-          render(history);
+          render(renderArgs);
         });
 
         // 删除按钮点击事件
         $("#history").on("click", ".delete", function () {
           let index = $(this).data("index"); // 获取要删除的记录索引
-          history.splice(index, 1); // 根据索引删除历史记录
-          render(history);
+          renderArgs.history.splice(index, 1); // 根据索引删除历史记录
+          render(renderArgs);
         });
 
         // 初始渲染
-        render(history);
+        render(renderArgs);
       });
 
-      function getRenderData(history) {
+      function getRenderData(renderArgs) {
         // 创建一个新的数组来渲染历史记录，避免直接修改原始历史记录数组
-        let display_data = history.slice();
+        let display_data = renderArgs.history.slice();
 
         // 数据排序
-        switch (currentSort) {
+        switch (renderArgs.currentSort) {
           case "win":
             display_data.sort(sortHistory);
             break;
@@ -180,7 +183,7 @@
         }
 
         // 数据过滤
-        switch (currentFilter) {
+        switch (renderArgs.currentFilter) {
           case "win":
             display_data = display_data.filter((item) => item.result === TEXT_WIN);
             break;
@@ -217,22 +220,25 @@
 
       // 计算胜率的函数
       // 返回胜率字符串，格式为 "XX.XX%"
-      function calcRate(score) {
-        return (score.total > 0 ? ((score.win / score.total) * 100).toFixed(2) : "0.00") + "%";
+      function calcRate(scoreArgs) {
+        let result = "0.00%";
+        if (scoreArgs.total > 0)
+          result = ((scoreArgs.win / scoreArgs.total) * 100).toFixed(2) + "%";
+        return result;
       }
 
-      function createScoreText(score) {
+      function createScoreText(scoreArgs) {
         return (
           "勝ち: " +
-          score.win +
+          scoreArgs.win +
           "/ 負け: " +
-          score.lose +
+          scoreArgs.lose +
           "/ 引き分け: " +
-          score.draw +
+          scoreArgs.draw +
           "/ 試合数: " +
-          score.total +
+          scoreArgs.total +
           "/ 勝率: " +
-          calcRate(score)
+          calcRate(scoreArgs)
         );
       }
 
@@ -289,33 +295,33 @@
         }
       }
 
-      function render(history) {
+      // 渲染历史记录和分数的函数
+      function render(renderArgs) {
         $("#history").html(""); // 清空历史记录显示
 
-        let display_data = getRenderData(history); // 获取要渲染的数据
+        let display_data = getRenderData(renderArgs); // 获取要渲染的数据
 
         // 遍历历史记录，计算分数并生成HTML
-        let score = { win: 0, lose: 0, draw: 0, total: history.length };
+        let scoreArgs = { win: 0, lose: 0, draw: 0, total: renderArgs.history.length };
         for (let i = 0; i < display_data.length; i++) {
           let recode = display_data[i]; // 获取当前记录
-
           // 根据结果设置不同的样式，并更新分数对象
           switch (recode.result) {
             case TEXT_WIN:
-              score.win++;
+              scoreArgs.win++;
               break;
             case TEXT_LOSE:
-              score.lose++;
+              scoreArgs.lose++;
               break;
             case TEXT_DRAW:
-              score.draw++;
+              scoreArgs.draw++;
               break;
           }
           $("#history").append(createItem(recode, i)); // 将结果添加到历史记录列表中
         }
 
-        $("#score").text(createScoreText(score)); // 更新分数显示
-        checkThreeWins(history); // 3连胜时，显示特殊消息
+        $("#score").text(createScoreText(scoreArgs)); // 更新分数显示
+        checkThreeWins(renderArgs.history); // 3连胜时，显示特殊消息
       }
     </script>
   </body>
