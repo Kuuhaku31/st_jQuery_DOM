@@ -7,54 +7,48 @@
   </head>
   <body>
     <button id="loadCat">ねこ読込</button>
-    <button id="loadUser">ユーザー読込</button>
     <p id="apiStatus"></p>
     <div id="catArea"></div>
     <div id="userArea"></div>
     <script>
       $(function () {
         const CAT_API = "https://api.thecatapi.com/v1/images/search";
-        const USER_API = "https://randomuser.me/api/?results=3&nat=jp";
-
         $("#loadCat").click(function () {
-          // 显示加载状态
-          $("#apiStatus").text("読込中...");
+          // 由于 fetch 是异步的，需要一个计数器来跟踪请求完成的次数
+          var count = 0;
+          $("#catArea").html(""); // 清空之前的图片
+          $("#apiStatus").text("読込中..."); // 显示加载状态
+          $("#loadCat").prop("disabled", true); // 禁用按钮，防止重复点击
 
-          // disable 按钮
-          $("#loadCat").prop("disabled", true);
+          // 连续请求3次
+          for (let i = 0; i < 3; i++) {
+            fetch(CAT_API)
+              .then(function (res) {
+                return res.json();
+              })
+              .then(function (data) {
+                // 将获取到的猫咪图片添加到页面中
+                $("#catArea").append(
+                  $("<img>").attr("src", data[0].url).css({
+                    width: "32%",
+                    "margin-right": "1%",
+                    "object-fit": "cover",
+                  }),
+                );
+              })
+              .catch(function (err) {
+                console.error(err);
+              })
 
-          fetch(CAT_API)
-            .then(function (res) {
-              return res.json();
-            })
-            .then(function (data) {
-              console.log(data);
-              const img = $("<img>").attr("src", data[0].url).css("max-width", "100%");
-              $("#catArea").html(img);
-            })
-            .catch(function (err) {
-              console.error(err);
-            })
-
-            // 无论成功还是失败，都要恢复按钮和状态
-            .finally(function () {
-              $("#apiStatus").text("");
-              $("#loadCat").prop("disabled", false);
-            });
-        });
-
-        $("#loadUser").click(function () {
-          fetch(USER_API)
-            .then(function (res) {
-              return res.json();
-            })
-            .then(function (data) {
-              console.log(data);
-            })
-            .catch(function (err) {
-              console.error(err);
-            });
-          // $("#userArea").html(users.join(""));
+              // 无论成功还是失败，都增加计数器并检查是否所有请求都完成
+              .finally(function () {
+                count++;
+                if (count >= 3) {
+                  $("#apiStatus").text("");
+                  $("#loadCat").prop("disabled", false);
+                }
+              });
+          }
         });
       });
     </script>
