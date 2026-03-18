@@ -1,0 +1,49 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <title>Cat API Sample</title>
+    <script src="https://code.jquery.com/jquery-4.0.0.min.js"></script>
+  </head>
+  <body>
+    <button id="loadCat">ねこ読込</button>
+    <button id="loadUser">ユーザー読込</button>
+    <div id="catArea"></div>
+    <div id="userArea"></div>
+    <script>
+      $(function () {
+        const CAT_API = "https://api.thecatapi.com/v1/images/search";
+        const USER_API = "https://randomuser.me/api/?results=3&nat=jp";
+
+        $("#loadCat").click(function () {
+          fetch(CAT_API)
+            .then(function (res) {
+              return res.json();
+            })
+            .then(function (data) {
+              console.log(data);
+              const img = $("<img>").attr("src", data[0].url).css("max-width", "100%");
+              $("#catArea").html(img);
+            })
+            .catch(function (err) {
+              console.error(err);
+            });
+        });
+
+        $("#loadUser").click(function () {
+          fetch(USER_API)
+            .then(function (res) {
+              return res.json();
+            })
+            .then(function (data) {
+              console.log(data);
+            })
+            .catch(function (err) {
+              console.error(err);
+            });
+          // $("#userArea").html(users.join(""));
+        });
+      });
+    </script>
+  </body>
+</html>
