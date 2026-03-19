@@ -1,18 +1,23 @@
+
 const CAT_API = "https://api.thecatapi.com/v1/images/search";
 const USER_API = "https://randomuser.me/api/?results=3&nat=jp";
 const INITIAL_DRAW_COUNT = 3;
 const PLAYER_CARD_LIMIT = 8;
 
 // 游戏状态对象
-const state = {
-    playerCards: [],      // 玩家当前拥有的卡牌列表
-    selectedCardId: null, // 当前选择的出战卡牌 ID 
-    enemyCard: null,      // 电脑当前的卡牌
-    round: 0,             // 当前回合数
-    started: false,       // 游戏是否已开始
-    isBusy: false,        // 是否正在进行异步操作（如抽卡或对战）
-    gameOver: false,      // 游戏是否结束
-};
+const state = {}; 
+
+// 获取初始状态对象的函数，返回一个新的状态对象
+function initialState(state) {
+    state.playerCards = [];      // 玩家当前拥有的卡牌列表
+    state.selectedCardId = null; // 当前选择的出战卡牌 ID 
+    state.enemyCard = null;      // 电脑当前的卡牌
+    state.round = 0;             // 当前回合数
+    state.started = false;       // 游戏是否已开始
+    state.isBusy = false;        // 是否正在进行异步操作（如抽卡或对战）
+    state.gameOver = false;      // 游戏是否结束
+    state.log = [];              // 游戏日志列表
+}
 
 // 通用的 fetch JSON 数据函数，带错误处理
 // async 表示这是一个异步函数，可以使用 await 来等待 Promise 的结果
@@ -108,12 +113,24 @@ function createCardElement(card, showActions, selected) {
     return cardEl;
 }
 
-// 输出日志信息到页面上的日志列表
-function addLog(message) {
-    const time = new Date().toLocaleTimeString();
-    const logItem = $("<li>").text(`[${time}] ${message}`);
-    $("#log").prepend(logItem);
+// 根据 state.log 数组渲染日志
+function renderLogs() {
+    const logContainer = $("#log");
+    logContainer.empty();
 
+    const logs = Array.isArray(state.log) ? state.log : [];
+    logs.forEach((item) => {
+        const logItem = $("<li>").text(`[${item.time}] ${item.message}`);
+        logContainer.append(logItem);
+    });
+}
+
+// 输出日志信息：先写入数组，再统一渲染
+function addLog(message) {
+    state.log.unshift({
+        time: new Date().toLocaleTimeString(),
+        message,
+    });
 }
 
 // 获取当前选择的出战卡牌对象，如果没有选择则返回 null
@@ -171,6 +188,7 @@ function render() {
         $(".choose-btn, .discard-btn").prop("disabled", true);
     }
 
+    renderLogs();
     updateStatusText();
 }
 
@@ -184,14 +202,7 @@ async function drawOneCard() {
 async function startGame() {
 
     // 重置游戏状态
-    state.isBusy = true;
-    state.started = false;
-    state.gameOver = false;
-    state.playerCards = [];
-    state.selectedCardId = null;
-    state.enemyCard = null;
-    state.round = 0;
-    $("#log").empty();
+    initialState(state); // 重新获取初始状态对象
     render();
 
     // 同时发起多个抽卡请求，等待所有请求完成后更新玩家的卡牌列表
@@ -341,6 +352,7 @@ function bindEvents() {
 
 $(function () {
     bindEvents();
+    initialState(state); // 初始化游戏状态
     render();
     addLog("点击\"开始游戏\"以抽取初始卡牌");
 });
