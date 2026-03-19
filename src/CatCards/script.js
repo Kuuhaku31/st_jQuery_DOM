@@ -132,31 +132,22 @@ function bindEvents() {
     // 执行一次对战，比较玩家选择的卡牌和电脑抽取的卡牌，根据结果更新状态和日志
     async function doBattle() {
 
-        // 如果游戏未开始、已结束或正在进行异步操作，禁止执行对战
-        if (!state.started || state.gameOver || state.isBusy) {
-            return;
-        }
-
         // 获取当前选择的出战卡牌，如果没有选择则提示玩家先选择卡牌
         const playerCard = findCardById(state.selectedCardId);
-        if (!playerCard) {
-            addLog("请先选择一张出战卡牌");
-            render();
-            return;
-        }
 
         // 设置正在进行对战的状态，禁用相关按钮，并更新界面
         state.isBusy = true;
         render();
 
         try {
-            state.round += 1;
+            state.round += 1;                  // 回合数加 1
             const enemy = await drawOneCard(); // 从 API 获取电脑的卡牌对象
-            state.enemyCard = enemy;
+            state.enemyCard = enemy;           // 更新电脑的卡牌状态以显示在界面上
 
             addLog(`第 ${state.round} 回合：电脑抽到 ${enemy.name}（攻击力 ${enemy.attack}）`);
 
-            if (playerCard.attack > enemy.attack) {
+            // 比较玩家的出战卡牌和电脑的卡牌，根据攻击力决定胜负
+            if(playerCard.attack > enemy.attack) {
                 if (state.playerCards.length < PLAYER_CARD_LIMIT) {
                     state.playerCards.push(enemy);
                     addLog(`你赢了，获得电脑卡牌 ${enemy.name}`);
@@ -168,23 +159,27 @@ function bindEvents() {
             else if (playerCard.attack < enemy.attack) {
                 removeCardById(state.selectedCardId);
                 addLog(`你输了，失去出战卡牌 ${playerCard.name}`);
-            } else {
+
+                if (state.playerCards.length === 0) {
+                    state.gameOver = true;
+                    addLog("你已没有卡牌，游戏结束");
+                }
+            }
+            // 平局则双方保留卡牌，并取消选择
+            else {
                 addLog("本回合平局，双方保留卡牌");
                 state.selectedCardId = null;
             }
+        }
 
-            if (state.playerCards.length === 0) {
-                state.gameOver = true;
-                addLog("你已没有卡牌，游戏结束");
-            }
-
-            if (!state.gameOver && state.selectedCardId && !state.playerCards.some((c) => c.id === state.selectedCardId)) {
-                state.selectedCardId = null;
-            }
-        } catch (error) {
+        // 捕获对战过程中可能发生的错误，输出错误信息并提示玩家重试
+        catch (error) {
             console.error(error);
             addLog("对局失败，请稍后重试");
-        } finally {
+        }
+
+        // 无论对战结果如何，都要重置正在进行对战的状态，并更新界面
+        finally {
             state.isBusy = false;
             render();
         }
@@ -273,11 +268,30 @@ function render() {
         return cardEl;
     }
 
-    // 更新回合数、卡牌数量和卡牌上限的显示
+    // 更新游戏状态显示
     {
+        // 更新回合数、卡牌数量和卡牌上限的显示
         $("#round-text").text(state.round);
         $("#card-count").text(state.playerCards.length);
         $("#card-limit").text(PLAYER_CARD_LIMIT);
+
+        // 更新游戏状态文本，根据当前游戏状态显示不同的提示信息
+        if(!state.started) {
+            $("#game-status").text("未开始");
+            return;
+        }
+
+        if(state.gameOver) {
+            $("#game-status").text("游戏结束");
+            return;
+        }
+
+        if(state.selectedCardId) {
+            $("#game-status").text("已选择出战卡");
+        }
+        else {
+            $("#game-status").text("等待选择卡牌");
+        }
     }
 
     // 渲染当前选择的出战卡牌和电脑的卡牌，不显示操作按钮，出战卡牌高亮显示
@@ -309,10 +323,6 @@ function render() {
     {
         $("#battle-btn").prop("disabled", !state.started || state.gameOver || state.isBusy || !state.selectedCardId);
         $("#start-game").prop("disabled", state.isBusy);
-
-        if (state.gameOver) {
-            $(".choose-btn, .discard-btn").prop("disabled", true);
-        }
     }
 
     // 根据 state.log 数组渲染日志
@@ -325,23 +335,6 @@ function render() {
             const logItem = $("<li>").text(`[${item.time}] ${item.message}`);
             logContainer.append(logItem);
         });
-
-        // 更新游戏状态文本，根据当前游戏状态显示不同的提示信息
-        if (!state.started) {
-            $("#game-status").text("未开始");
-            return;
-        }
-
-        if (state.gameOver) {
-            $("#game-status").text("游戏结束");
-            return;
-        }
-
-        if (state.selectedCardId) {
-            $("#game-status").text("已选择出战卡");
-        } else {
-            $("#game-status").text("等待选择卡牌");
-        }
     }
 }
 
