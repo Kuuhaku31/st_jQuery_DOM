@@ -37,6 +37,7 @@ function render() {
     // 生成卡牌的 HTML 结构
     // showActions 参数控制是否显示出战和丢弃按钮
     // selected 参数控制是否高亮显示
+    // 返回一个 jQuery 对象，表示整个卡牌元素
     function createCardElement(card, showActions, selected) {
 
         // 如果没有卡牌数据，返回一个提示信息
@@ -72,58 +73,74 @@ function render() {
     }
 
     // 更新回合数、卡牌数量和卡牌上限的显示
-    $("#round-text").text(state.round);
-    $("#card-count").text(state.playerCards.length);
-    $("#card-limit").text(PLAYER_CARD_LIMIT);
-
-    // 渲染玩家的卡牌列表，根据当前状态决定是否显示操作按钮和高亮选择的卡牌
-    const cardsContainer = $("#player-cards");
-    cardsContainer.empty(); // 清空当前的卡牌显示
-    state.playerCards.forEach((card) => {
-        const cardEl = createCardElement(card, !state.gameOver, card.id === state.selectedCardId);
-        cardsContainer.append(cardEl);
-    });
-
-    if (state.playerCards.length === 0) {
-        cardsContainer.append("<p>没有卡牌了，请重新开始游戏。</p>");
+    {
+        $("#round-text").text(state.round);
+        $("#card-count").text(state.playerCards.length);
+        $("#card-limit").text(PLAYER_CARD_LIMIT);
     }
 
-    const selectedCard = getSelectedCard();
-    $("#selected-card").empty().append(createCardElement(selectedCard, false, true));
-    $("#enemy-card").empty().append(createCardElement(state.enemyCard, false, false));
+    // 渲染当前选择的出战卡牌和电脑的卡牌，不显示操作按钮，出战卡牌高亮显示
+    {
+        const selectedCard = getSelectedCard();
+        $("#selected-card").empty().append(createCardElement(selectedCard, false, true));
+        $("#enemy-card").empty().append(createCardElement(state.enemyCard, false, false));
+    }
 
-    $("#battle-btn").prop("disabled", !state.started || state.gameOver || state.isBusy || !state.selectedCardId);
-    $("#start-game").prop("disabled", state.isBusy);
+    // 渲染手牌区
+    // 如果玩家没有卡牌了，显示提示信息
+    const cardsContainer = $("#player-cards");
+    if(state.playerCards.length === 0) {
+        cardsContainer.html("<p>没有卡牌了，请重新开始游戏。</p>");
+    }
+    // 否则渲染玩家的卡牌列表
+    else {
+        cardsContainer.empty(); // 清空当前的卡牌显示
+        for (const card of state.playerCards) {
+            const cardEl = createCardElement(card, !state.gameOver, card.id === state.selectedCardId);
+            cardsContainer.append(cardEl);
+        }
+    }
 
-    if (state.gameOver) {
-        $(".choose-btn, .discard-btn").prop("disabled", true);
+    // 根据游戏状态更新按钮的可用性
+    // 游戏未开始、已结束、正在进行异步操作或没有选择出战卡牌时禁用对战按钮
+    // 正在进行异步操作时禁用开始游戏按钮
+    // 游戏结束时禁用所有操作按钮
+    {
+        $("#battle-btn").prop("disabled", !state.started || state.gameOver || state.isBusy || !state.selectedCardId);
+        $("#start-game").prop("disabled", state.isBusy);
+
+        if (state.gameOver) {
+            $(".choose-btn, .discard-btn").prop("disabled", true);
+        }
     }
 
     // 根据 state.log 数组渲染日志
-    const logContainer = $("#log");
-    logContainer.empty();
+    {
+        const logContainer = $("#log");
+        logContainer.empty();
 
-    const logs = Array.isArray(state.log) ? state.log : [];
-    logs.forEach((item) => {
-        const logItem = $("<li>").text(`[${item.time}] ${item.message}`);
-        logContainer.append(logItem);
-    });
+        const logs = Array.isArray(state.log) ? state.log : [];
+        logs.forEach((item) => {
+            const logItem = $("<li>").text(`[${item.time}] ${item.message}`);
+            logContainer.append(logItem);
+        });
 
-    // 更新游戏状态文本，根据当前游戏状态显示不同的提示信息
-    if (!state.started) {
-        $("#game-status").text("未开始");
-        return;
-    }
+        // 更新游戏状态文本，根据当前游戏状态显示不同的提示信息
+        if (!state.started) {
+            $("#game-status").text("未开始");
+            return;
+        }
 
-    if (state.gameOver) {
-        $("#game-status").text("游戏结束");
-        return;
-    }
+        if (state.gameOver) {
+            $("#game-status").text("游戏结束");
+            return;
+        }
 
-    if (state.selectedCardId) {
-        $("#game-status").text("已选择出战卡");
-    } else {
-        $("#game-status").text("等待选择卡牌");
+        if (state.selectedCardId) {
+            $("#game-status").text("已选择出战卡");
+        } else {
+            $("#game-status").text("等待选择卡牌");
+        }
     }
 }
 
