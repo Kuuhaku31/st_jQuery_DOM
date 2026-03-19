@@ -42,43 +42,31 @@ function render() {
         // 如果没有卡牌数据，返回一个提示信息
         if (!card) return $("<p>").text("暂无卡牌");
 
-        // 创建卡牌的根元素，添加 selected 类以高亮显示
-        const cardEl = $("<article>", {
-            class: `card ${selected ? "selected" : ""}`.trim(),
-            "data-id": card.id,
-        });
+        // 创建卡牌的根元素，如果需要高亮显示则添加 selected 类
+        const cardEl = $("<article>").addClass("card");
+        if (selected) cardEl.addClass("selected");
 
         // 创建卡牌的图片元素
-        const imageEl = $("<img>", {
-            src: card.imageUrl,
-            alt: card.name,
-        });
+        const imageEl = $("<img>").attr("src", card.imageUrl).attr("alt", card.name);
 
         // 创建卡牌内容元素，包括名称和攻击力
-        const contentEl = $("<div>", { class: "content" });
-        const nameEl    = $("<p>", { class: "name" }).text(card.name);
-        const metaEl    = $("<p>", { class: "meta" }).html(`攻击力: <strong>${card.attack}</strong>`);
+        const contentEl = $("<div>").addClass("content");
+        const nameEl    = $("<p>")  .addClass("name").text(card.name);
+        const metaEl    = $("<p>")  .addClass("meta").html(`攻击力: <strong>${card.attack}</strong>`);
 
         // 将名称和攻击力添加到内容元素中
         contentEl.append(nameEl, metaEl);
 
         // 如果需要显示操作按钮，创建出战和丢弃按钮，并添加到内容元素中
         if(showActions) {
-            const actionsEl = $("<div>", { class: "card-actions" });
-            const chooseBtn = $("<button>", {
-                class: "choose-btn",
-                "data-id": card.id,
-                text: "出战",
-            });
-            const discardBtn = $("<button>", {
-                class: "danger discard-btn",
-                "data-id": card.id,
-                text: "丢弃",
-            });
+            const actionsEl  = $("<div>")   .addClass("card-actions");
+            const chooseBtn  = $("<button>").addClass("choose-btn")        .data("id", card.id).text("出战");
+            const discardBtn = $("<button>").addClass("discard-btn danger").data("id", card.id).text("丢弃");
             actionsEl.append(chooseBtn, discardBtn);
             contentEl.append(actionsEl);
         }
 
+        // 将图片和内容添加到卡牌根元素中，并返回整个卡牌元素
         cardEl.append(imageEl, contentEl);
         return cardEl;
     }
