@@ -1,6 +1,4 @@
 
-const CAT_API = "https://api.thecatapi.com/v1/images/search";
-const USER_API = "https://randomuser.me/api/?results=3&nat=jp";
 const INITIAL_DRAW_COUNT = 3;
 const PLAYER_CARD_LIMIT = 8;
 
@@ -20,119 +18,6 @@ function initialState(state) {
     state.log = [];              // 游戏日志列表
 }
 
-// 通用的 fetch JSON 数据函数，带错误处理
-// async 表示这是一个异步函数，可以使用 await 来等待 Promise 的结果
-async function fetchJson(url) {
-    const response = await fetch(url);
-    if(!response.ok) {
-        throw new Error(`Request failed: ${response.status}`);
-    }
-    return response.json();
-}
-
-// 从猫咪 API 获取一张猫咪图片的 URL
-async function getCatImageUrl() {
-    const data = await fetchJson(CAT_API);
-    return data[0]?.url || "";
-}
-
-// 从随机用户 API 获取一个用户的信息
-async function getUserInfo() {
-    const data = await fetchJson(USER_API);
-    const user = data.results?.[0];
-    if (!user) {
-        throw new Error("No user data");
-    }
-
-    return {
-        firstName:    user.name.first,             // 用户的名字
-        lastName:     user.name.last,              // 用户的姓氏
-        age:          user.dob.age,                // 用户的年龄
-        streetNumber: user.location.street.number, // 用户住址的街道号码
-    };
-}
-
-// 根据猫咪图片 URL 和用户信息创建一张卡牌对象
-function makeCard(catImageUrl, userInfo) {
-
-    // 计算卡牌的攻击力，基于用户的年龄和街道号码，确保最低攻击力为 10
-    const attack = Math.max(10, (userInfo.age % 50) + (userInfo.streetNumber % 30));
-
-    // 使用计数器生成卡牌 ID，保证同一局内递增唯一
-    if (typeof state.cardID !== "number") {
-        state.cardID = 0;
-    }
-    state.cardID += 1;
-
-    return {
-        id:       `card-${state.cardID}`, // 通过计数器生成唯一卡牌 ID
-        imageUrl: catImageUrl,                                            // 卡牌的图片 URL
-        name:     `${userInfo.firstName} ${userInfo.lastName}`,           // 卡牌的名称
-        attack,                                                           // 卡牌的攻击力
-    };
-}
-
-// 生成卡牌的 HTML 结构
-// showActions 参数控制是否显示出战和丢弃按钮
-// selected 参数控制是否高亮显示
-function createCardElement(card, showActions, selected) {
-
-    // 如果没有卡牌数据，返回一个提示信息
-    if (!card) return $("<p>").text("暂无卡牌");
-
-    // 创建卡牌的根元素，添加 selected 类以高亮显示
-    const cardEl = $("<article>", {
-        class: `card ${selected ? "selected" : ""}`.trim(),
-        "data-id": card.id,
-    });
-
-    // 创建卡牌的图片元素
-    const imageEl = $("<img>", {
-        src: card.imageUrl,
-        alt: card.name,
-    });
-
-    // 创建卡牌内容元素，包括名称和攻击力
-    const contentEl = $("<div>", { class: "content" });
-    const nameEl    = $("<p>", { class: "name" }).text(card.name);
-    const metaEl    = $("<p>", { class: "meta" }).html(`攻击力: <strong>${card.attack}</strong>`);
-
-    // 将名称和攻击力添加到内容元素中
-    contentEl.append(nameEl, metaEl);
-
-    // 如果需要显示操作按钮，创建出战和丢弃按钮，并添加到内容元素中
-    if(showActions) {
-        const actionsEl = $("<div>", { class: "card-actions" });
-        const chooseBtn = $("<button>", {
-            class: "choose-btn",
-            "data-id": card.id,
-            text: "出战",
-        });
-        const discardBtn = $("<button>", {
-            class: "danger discard-btn",
-            "data-id": card.id,
-            text: "丢弃",
-        });
-        actionsEl.append(chooseBtn, discardBtn);
-        contentEl.append(actionsEl);
-    }
-
-    cardEl.append(imageEl, contentEl);
-    return cardEl;
-}
-
-// 根据 state.log 数组渲染日志
-function renderLogs() {
-    const logContainer = $("#log");
-    logContainer.empty();
-
-    const logs = Array.isArray(state.log) ? state.log : [];
-    logs.forEach((item) => {
-        const logItem = $("<li>").text(`[${item.time}] ${item.message}`);
-        logContainer.append(logItem);
-    });
-}
-
 // 输出日志信息：先写入数组，再统一渲染
 function addLog(message) {
     state.log.unshift({
@@ -146,27 +31,57 @@ function getSelectedCard() {
     return state.playerCards.find((c) => c.id === state.selectedCardId) || null;
 }
 
-// 更新游戏状态文本，根据当前游戏状态显示不同的提示信息
-function updateStatusText() {
-    if (!state.started) {
-        $("#game-status").text("未开始");
-        return;
-    }
-
-    if (state.gameOver) {
-        $("#game-status").text("游戏结束");
-        return;
-    }
-
-    if (state.selectedCardId) {
-        $("#game-status").text("已选择出战卡");
-    } else {
-        $("#game-status").text("等待选择卡牌");
-    }
-}
-
 // 渲染游戏界面，根据当前状态更新页面上的卡牌、按钮状态和日志等信息
 function render() {
+
+    // 生成卡牌的 HTML 结构
+    // showActions 参数控制是否显示出战和丢弃按钮
+    // selected 参数控制是否高亮显示
+    function createCardElement(card, showActions, selected) {
+
+        // 如果没有卡牌数据，返回一个提示信息
+        if (!card) return $("<p>").text("暂无卡牌");
+
+        // 创建卡牌的根元素，添加 selected 类以高亮显示
+        const cardEl = $("<article>", {
+            class: `card ${selected ? "selected" : ""}`.trim(),
+            "data-id": card.id,
+        });
+
+        // 创建卡牌的图片元素
+        const imageEl = $("<img>", {
+            src: card.imageUrl,
+            alt: card.name,
+        });
+
+        // 创建卡牌内容元素，包括名称和攻击力
+        const contentEl = $("<div>", { class: "content" });
+        const nameEl    = $("<p>", { class: "name" }).text(card.name);
+        const metaEl    = $("<p>", { class: "meta" }).html(`攻击力: <strong>${card.attack}</strong>`);
+
+        // 将名称和攻击力添加到内容元素中
+        contentEl.append(nameEl, metaEl);
+
+        // 如果需要显示操作按钮，创建出战和丢弃按钮，并添加到内容元素中
+        if(showActions) {
+            const actionsEl = $("<div>", { class: "card-actions" });
+            const chooseBtn = $("<button>", {
+                class: "choose-btn",
+                "data-id": card.id,
+                text: "出战",
+            });
+            const discardBtn = $("<button>", {
+                class: "danger discard-btn",
+                "data-id": card.id,
+                text: "丢弃",
+            });
+            actionsEl.append(chooseBtn, discardBtn);
+            contentEl.append(actionsEl);
+        }
+
+        cardEl.append(imageEl, contentEl);
+        return cardEl;
+    }
 
     // 更新回合数、卡牌数量和卡牌上限的显示
     $("#round-text").text(state.round);
@@ -196,14 +111,98 @@ function render() {
         $(".choose-btn, .discard-btn").prop("disabled", true);
     }
 
-    renderLogs();
-    updateStatusText();
+    // 根据 state.log 数组渲染日志
+    const logContainer = $("#log");
+    logContainer.empty();
+
+    const logs = Array.isArray(state.log) ? state.log : [];
+    logs.forEach((item) => {
+        const logItem = $("<li>").text(`[${item.time}] ${item.message}`);
+        logContainer.append(logItem);
+    });
+
+    // 更新游戏状态文本，根据当前游戏状态显示不同的提示信息
+    if (!state.started) {
+        $("#game-status").text("未开始");
+        return;
+    }
+
+    if (state.gameOver) {
+        $("#game-status").text("游戏结束");
+        return;
+    }
+
+    if (state.selectedCardId) {
+        $("#game-status").text("已选择出战卡");
+    } else {
+        $("#game-status").text("等待选择卡牌");
+    }
 }
 
 // 从 API 获取一张新的卡牌对象
 async function drawOneCard() {
-    const [catImageUrl, userInfo] = await Promise.all([getCatImageUrl(), getUserInfo()]);
-    return makeCard(catImageUrl, userInfo);
+
+    const CAT_API  = "https://api.thecatapi.com/v1/images/search";
+    const USER_API = "https://randomuser.me/api/?results=3&nat=jp";
+
+    // 通用的 fetch JSON 数据函数，带错误处理
+    // async 表示这是一个异步函数，可以使用 await 来等待 Promise 的结果
+    async function fetchJson(url) {
+        const response = await fetch(url);
+        if(!response.ok) {
+            throw new Error(`Request failed: ${response.status}`);
+        }
+        return response.json();
+    }
+
+    // 从猫咪 API 获取一张猫咪图片的 URL
+    async function getCatImageUrl() {
+        const data = await fetchJson(CAT_API);
+        return data[0]?.url || "";
+    }
+
+    // 从随机用户 API 获取一个用户的信息
+    async function getUserInfo() {
+        const data = await fetchJson(USER_API);
+        const user = data.results?.[0];
+        if (!user) {
+            throw new Error("No user data");
+        }
+
+        return {
+            firstName:    user.name.first,             // 用户的名字
+            lastName:     user.name.last,              // 用户的姓氏
+            age:          user.dob.age,                // 用户的年龄
+            streetNumber: user.location.street.number, // 用户住址的街道号码
+        };
+    }
+
+    // 根据猫咪图片 URL 和用户信息创建一张卡牌对象
+    function makeCard(catImageUrl, userInfo) {
+
+        // 计算卡牌的攻击力，基于用户的年龄和街道号码，确保最低攻击力为 10
+        const attack = Math.max(10, (userInfo.age % 50) + (userInfo.streetNumber % 30));
+
+        // 使用计数器生成卡牌 ID，保证同一局内递增唯一
+        if (typeof state.cardID !== "number") {
+            state.cardID = 0;
+        }
+        state.cardID += 1;
+
+        return {
+            id:       `card-${state.cardID}`, // 通过计数器生成唯一卡牌 ID
+            imageUrl: catImageUrl,                                            // 卡牌的图片 URL
+            name:     `${userInfo.firstName} ${userInfo.lastName}`,           // 卡牌的名称
+            attack,                                                           // 卡牌的攻击力
+        };
+    }
+
+    // 发起两个 API 请求，等待它们都完成后再创建卡牌对象
+    const catImageUrl = await getCatImageUrl();
+    const userInfo    = await getUserInfo();
+    const newCard     = makeCard(catImageUrl, userInfo);
+
+    return newCard;
 }
 
 // 开始游戏，重置状态并抽取初始卡牌
