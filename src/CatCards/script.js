@@ -9,6 +9,7 @@ const state = {};
 
 // 获取初始状态对象的函数，返回一个新的状态对象
 function initialState(state) {
+    state.cardID = 0;            // 用于生成唯一卡牌 ID 的计数器
     state.playerCards = [];      // 玩家当前拥有的卡牌列表
     state.selectedCardId = null; // 当前选择的出战卡牌 ID 
     state.enemyCard = null;      // 电脑当前的卡牌
@@ -56,8 +57,15 @@ function makeCard(catImageUrl, userInfo) {
 
     // 计算卡牌的攻击力，基于用户的年龄和街道号码，确保最低攻击力为 10
     const attack = Math.max(10, (userInfo.age % 50) + (userInfo.streetNumber % 30));
+
+    // 使用计数器生成卡牌 ID，保证同一局内递增唯一
+    if (typeof state.cardID !== "number") {
+        state.cardID = 0;
+    }
+    state.cardID += 1;
+
     return {
-        id:       `${Date.now()}-${Math.random().toString(16).slice(2)}`, // 生成一个唯一的卡牌 ID
+        id:       `card-${state.cardID}`, // 通过计数器生成唯一卡牌 ID
         imageUrl: catImageUrl,                                            // 卡牌的图片 URL
         name:     `${userInfo.firstName} ${userInfo.lastName}`,           // 卡牌的名称
         attack,                                                           // 卡牌的攻击力
