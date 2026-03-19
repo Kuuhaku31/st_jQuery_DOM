@@ -12,9 +12,7 @@ function initialState(state) {
     state.selectedCardId = null;   // 当前选择的出战卡牌 ID 
     state.enemyCard      = null;   // 电脑当前的卡牌
     state.round          = 0;      // 当前回合数
-    state.started        = false;  // 游戏是否已开始
     state.isBusy         = false;  // 是否正在进行异步操作（如抽卡或对战）
-    state.gameOver       = false;  // 游戏是否结束
     state.log            = [];     // 游戏日志列表
 }
 
@@ -111,6 +109,7 @@ function bindEvents() {
 
         // 重置游戏状态
         initialState(state); // 重新获取初始状态对象
+        state.isBusy = true;
         render();
 
         // 同时发起多个抽卡请求，等待所有请求完成后更新玩家的卡牌列表
@@ -118,7 +117,6 @@ function bindEvents() {
             const tasks = Array.from({ length: INITIAL_DRAW_COUNT }, () => drawOneCard()); // 创建一个包含多个抽卡任务的数组
             const cards = await Promise.all(tasks); // 等待所有抽卡任务完成，得到一个包含多张卡牌的数组
             state.playerCards = cards; // 将抽取到的卡牌添加到玩家的卡牌列表中
-            state.started = true;
             addLog(`开局抽卡完成，获得 ${cards.length} 张卡牌`);
         } catch (error) {
             console.error(error);
@@ -161,7 +159,6 @@ function bindEvents() {
                 addLog(`你输了，失去出战卡牌 ${playerCard.name}`);
 
                 if (state.playerCards.length === 0) {
-                    state.gameOver = true;
                     addLog("你已没有卡牌，游戏结束");
                 }
             }
@@ -211,7 +208,6 @@ function bindEvents() {
 
         // 如果玩家没有卡牌了，游戏结束
         if(state.playerCards.length === 0) {
-            state.gameOver = true;
             addLog("你已没有卡牌，游戏结束");
         }
 
@@ -274,24 +270,6 @@ function render() {
         $("#round-text").text(state.round);
         $("#card-count").text(state.playerCards.length);
         $("#card-limit").text(PLAYER_CARD_LIMIT);
-
-        // 更新游戏状态文本，根据当前游戏状态显示不同的提示信息
-        if(!state.started) {
-            $("#game-status").text("未开始");
-            return;
-        }
-
-        if(state.gameOver) {
-            $("#game-status").text("游戏结束");
-            return;
-        }
-
-        if(state.selectedCardId) {
-            $("#game-status").text("已选择出战卡");
-        }
-        else {
-            $("#game-status").text("等待选择卡牌");
-        }
     }
 
     // 渲染当前选择的出战卡牌和电脑的卡牌，不显示操作按钮，出战卡牌高亮显示
@@ -311,7 +289,7 @@ function render() {
     else {
         cardsContainer.empty(); // 清空当前的卡牌显示
         for (const card of state.playerCards) {
-            const cardEl = createCardElement(card, !state.gameOver, card.id === state.selectedCardId);
+            const cardEl = createCardElement(card, true, card.id === state.selectedCardId);
             cardsContainer.append(cardEl);
         }
     }
@@ -321,7 +299,7 @@ function render() {
     // 正在进行异步操作时禁用开始游戏按钮
     // 游戏结束时禁用所有操作按钮
     {
-        $("#battle-btn").prop("disabled", !state.started || state.gameOver || state.isBusy || !state.selectedCardId);
+        $("#battle-btn").prop("disabled", state.isBusy || !state.selectedCardId);
         $("#start-game").prop("disabled", state.isBusy);
     }
 
