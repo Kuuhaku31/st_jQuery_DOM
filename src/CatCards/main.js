@@ -2,23 +2,22 @@
 const INITIAL_DRAW_COUNT = 3;
 const PLAYER_CARD_LIMIT = 8;
 
-// 游戏状态对象
-const state = {}; 
+const gameState = {};    // 游戏状态对象
+let   isBusy    = false; // 是否正在进行异步操作（如抽卡或对战）
 
 // 获取初始状态对象的函数，返回一个新的状态对象
-function initialState(state) {
-    state.cardID         = 0;      // 用于生成唯一卡牌 ID 的计数器
-    state.playerCards    = [];     // 玩家当前拥有的卡牌列表
-    state.selectedCardId = null;   // 当前选择的出战卡牌 ID 
-    state.enemyCard      = null;   // 电脑当前的卡牌
-    state.round          = 0;      // 当前回合数
-    state.isBusy         = false;  // 是否正在进行异步操作（如抽卡或对战）
-    state.log            = [];     // 游戏日志列表
+function initialState(gameState) {
+    gameState.cardID         = 0;      // 用于生成唯一卡牌 ID 的计数器
+    gameState.playerCards    = [];     // 玩家当前拥有的卡牌列表
+    gameState.selectedCardId = null;   // 当前选择的出战卡牌 ID 
+    gameState.enemyCard      = null;   // 电脑当前的卡牌
+    gameState.round          = 0;      // 当前回合数
+    gameState.log            = [];     // 游戏日志列表
 }
 
 // 输出日志信息：先写入数组，再统一渲染
 function addLog(message) {
-    state.log.push({
+    gameState.log.push({
         time: new Date().toLocaleTimeString(),
         message,
     });
@@ -26,13 +25,13 @@ function addLog(message) {
 
 // 通过id查询卡牌是否存在于玩家的卡牌列表中，如果存在则返回该卡牌对象，否则返回 null
 function findCardById(cardId) {
-    return state.playerCards.find((c) => c.id === cardId) || null;
+    return gameState.playerCards.find((c) => c.id === cardId) || null;
 }
 
 // 移除卡牌
 function removeCardById(cardId) {
-    state.playerCards = state.playerCards.filter((c) => c.id !== cardId);
-    if(state.selectedCardId === cardId) state.selectedCardId = null; // 如果丢弃的卡牌是当前选择的出战卡牌，则取消选择
+    gameState.playerCards = gameState.playerCards.filter((c) => c.id !== cardId);
+    if(gameState.selectedCardId === cardId) gameState.selectedCardId = null; // 如果丢弃的卡牌是当前选择的出战卡牌，则取消选择
 }
 
 // 从 API 获取一张新的卡牌信息
@@ -87,11 +86,20 @@ async function getCardInfoFromAPI() {
     }
 
     // 发起两个 API 请求，等待它们都完成后再创建卡牌对象
-    const catImageUrl = await getCatImageUrl();
-    const userInfo    = await getUserInfo();
-    const newCardInfo = makeCardInfo(catImageUrl, userInfo);
+    try {
 
-    return newCardInfo;
+        const catImageUrl = await getCatImageUrl();
+        const userInfo    = await getUserInfo();
+        const newCardInfo = makeCardInfo(catImageUrl, userInfo);
+
+        return newCardInfo;
+    }
+
+    // 如果在获取卡牌信息的过程中发生任何错误
+    catch (error) {
+        console.error("Error fetching card info:", error);
+        return null;
+    }
 }
 
 // 抽卡
@@ -99,9 +107,9 @@ async function drawOneCard(isForEnemy = false) {
 
     console.log("drawOneCard");
 
-    state.isBusy = true; // 设置正在进行抽卡的状态，禁用相关按钮
+    isBusy = true; // 设置正在进行抽卡的状态，禁用相关按钮
 
-    const newCardID = `card-${state.cardID++}`; // 生成新的卡牌 ID
+    const newCardID = `card-${gameState.cardID++}`; // 生成新的卡牌 ID
     const newCard = {
         id:       newCardID, // 使用生成的卡牌 ID
         imageUrl: null,
@@ -109,39 +117,43 @@ async function drawOneCard(isForEnemy = false) {
         attack:   null,
     };
 
-    if(isForEnemy) state.enemyCard = newCard; // 更新电脑的卡牌状态以显示在界面上
-    else state.playerCards.push(newCard); // 将新卡牌添加到玩家的卡牌列表中
+    if(isForEnemy) gameState.enemyCard = newCard; // 更新电脑的卡牌状态以显示在界面上
+    else gameState.playerCards.push(newCard); // 将新卡牌添加到玩家的卡牌列表中
 
+    render();
 
-    try {
-        const cardInfo = await getCardInfoFromAPI(); // 从 API 获取卡牌信息
-        
-        if(isForEnemy) {
-            state.enemyCard.imageUrl = cardInfo.imageUrl;
-            state.enemyCard.name     = cardInfo.name;
-            state.enemyCard.attack   = cardInfo.attack;
-        } else {
-            const playerCard = findCardById(newCardID);
-            if (playerCard) {
-                playerCard.imageUrl = cardInfo.imageUrl;
-                playerCard.name     = cardInfo.name;
-                playerCard.attack   = cardInfo.attack;
-            }
-        }
-
-        addLog(`抽到卡牌 ${cardInfo.name}（攻击力 ${cardInfo.attack}）`);
-
-    } catch (error) {
-        console.error(error);
-        addLog("抽卡失败，请检查网络后重试");
-    } finally {
-        state.isBusy = false; // 无论成功与否都要重置正在进行抽卡的状态
-        render(); // 无论成功与否都要更新界面显示
-
-        console.log("drawOneCard try结束");
+    const cardInfo = await getCardInfoFromAPI(); // 从 API 获取卡牌信息（同步）
+    if(!cardInfo) {
+        addLog("抽卡失败，请检查网络连接或稍后再试");
     }
 
-    console.log("drawOneCard结束");
+    // 如果为电脑抽卡
+    else if(isForEnemy) {
+
+        gameState.enemyCard.imageUrl = cardInfo.imageUrl;
+        gameState.enemyCard.name     = cardInfo.name;
+        gameState.enemyCard.attack   = cardInfo.attack;
+
+        addLog(`第 ${gameState.round} 回合：电脑抽到 ${gameState.enemyCard.name}（攻击力 ${gameState.enemyCard.attack}）`);
+    }
+
+    // 如果为玩家抽卡
+    else {
+        // 更新玩家卡牌列表中对应卡牌的信息
+        const playerCard = findCardById(newCardID);
+        if(playerCard) {
+
+            playerCard.imageUrl = cardInfo.imageUrl;
+            playerCard.name     = cardInfo.name;
+            playerCard.attack   = cardInfo.attack;
+
+            addLog(`抽到卡牌 ${cardInfo.name}（攻击力 ${cardInfo.attack}）`);
+        }
+    }
+
+    // 抽卡完成后重置状态并更新界面显示
+    isBusy = false; // 重置正在进行抽卡的状态
+    render();             // 更新界面显示
 }
 
 // 绑定页面上的按钮和卡牌操作事件，设置相应的事件处理函数
@@ -153,14 +165,14 @@ function bindEvents() {
         console.log("startGame");
 
         // 重置游戏状态
-        initialState(state); // 重新获取初始状态对象
+        initialState(gameState); // 重新获取初始状态对象
         render();
 
         // 同时发起多个抽卡请求，等待所有请求完成后更新玩家的卡牌列表
-        for (let i = 0; i < 1; i++) {
+        for (let i = 0; i < INITIAL_DRAW_COUNT; i++) {
             drawOneCard(false); // 抽取玩家的卡牌
         }
-        addLog(`开局抽卡完成，获得 ${state.playerCards.length} 张卡牌`);
+        addLog(`开局抽卡完成，获得 ${gameState.playerCards.length} 张卡牌`);
     
         render();
 
@@ -170,56 +182,42 @@ function bindEvents() {
     // 执行一次对战，比较玩家选择的卡牌和电脑抽取的卡牌，根据结果更新状态和日志
     async function doBattle() {
 
-        // 获取当前选择的出战卡牌，如果没有选择则提示玩家先选择卡牌
-        const playerCard = findCardById(state.selectedCardId);
+        console.log("doBattle");
 
-        // 设置正在进行对战的状态，禁用相关按钮，并更新界面
-        state.isBusy = true;
+        // 获取当前选择的出战卡牌，如果没有选择则提示玩家先选择卡牌
+        const playerCard = findCardById(gameState.selectedCardId);
+
+        gameState.round += 1;        // 回合数加 1
+        await drawOneCard(true); // 抽取电脑的卡牌，等待抽卡完成后再继续对战逻辑
+        const enemy = gameState.enemyCard; // 获取电脑的卡牌信息
+
+        // 比较玩家的出战卡牌和电脑的卡牌，根据攻击力决定胜负
+        if(playerCard.attack > enemy.attack) {
+            if (gameState.playerCards.length < PLAYER_CARD_LIMIT) {
+                gameState.playerCards.push(enemy);
+                addLog(`你赢了，获得电脑卡牌 ${enemy.name}`);
+            } else {
+                addLog("你赢了，但卡牌已达到上限，无法获得新卡牌");
+            }
+        }
+        // 从玩家的卡牌列表中移除当前选择的出战卡牌，并取消选择
+        else if (playerCard.attack < enemy.attack) {
+            removeCardById(gameState.selectedCardId);
+            addLog(`你输了，失去出战卡牌 ${playerCard.name}`);
+
+            if (gameState.playerCards.length === 0) {
+                addLog("你已没有卡牌，游戏结束");
+            }
+        }
+        // 平局则双方保留卡牌，并取消选择
+        else {
+            addLog("本回合平局，双方保留卡牌");
+            gameState.selectedCardId = null;
+        }
+
         render();
 
-        try {
-            state.round += 1;                  // 回合数加 1
-            const enemy = await getCardInfoFromAPI(); // 从 API 获取电脑的卡牌对象
-            state.enemyCard = enemy;           // 更新电脑的卡牌状态以显示在界面上
-
-            addLog(`第 ${state.round} 回合：电脑抽到 ${enemy.name}（攻击力 ${enemy.attack}）`);
-
-            // 比较玩家的出战卡牌和电脑的卡牌，根据攻击力决定胜负
-            if(playerCard.attack > enemy.attack) {
-                if (state.playerCards.length < PLAYER_CARD_LIMIT) {
-                    state.playerCards.push(enemy);
-                    addLog(`你赢了，获得电脑卡牌 ${enemy.name}`);
-                } else {
-                    addLog("你赢了，但卡牌已达到上限，无法获得新卡牌");
-                }
-            }
-            // 从玩家的卡牌列表中移除当前选择的出战卡牌，并取消选择
-            else if (playerCard.attack < enemy.attack) {
-                removeCardById(state.selectedCardId);
-                addLog(`你输了，失去出战卡牌 ${playerCard.name}`);
-
-                if (state.playerCards.length === 0) {
-                    addLog("你已没有卡牌，游戏结束");
-                }
-            }
-            // 平局则双方保留卡牌，并取消选择
-            else {
-                addLog("本回合平局，双方保留卡牌");
-                state.selectedCardId = null;
-            }
-        }
-
-        // 捕获对战过程中可能发生的错误，输出错误信息并提示玩家重试
-        catch (error) {
-            console.error(error);
-            addLog("对局失败，请稍后重试");
-        }
-
-        // 无论对战结果如何，都要重置正在进行对战的状态，并更新界面
-        finally {
-            state.isBusy = false;
-            render();
-        }
+        console.log("doBattle结束");
     }
 
     // 选择一张卡牌作为出战卡牌，更新状态并输出日志
@@ -230,7 +228,7 @@ function bindEvents() {
         if(!card) return;
 
         // 更新当前选择的出战卡牌 ID，并输出日志信息
-        state.selectedCardId = cardId;
+        gameState.selectedCardId = cardId;
         addLog(`选择 ${card.name} 出战，攻击力 ${card.attack}`);
         render();
     }
@@ -247,7 +245,7 @@ function bindEvents() {
         addLog(`丢弃卡牌 ${card.name}`);
 
         // 如果玩家没有卡牌了，游戏结束
-        if(state.playerCards.length === 0) {
+        if(gameState.playerCards.length === 0) {
             addLog("你已没有卡牌，游戏结束");
         }
 
@@ -307,29 +305,29 @@ function render() {
     // 更新游戏状态显示
     {
         // 更新回合数、卡牌数量和卡牌上限的显示
-        $("#round-text").text(state.round);
-        $("#card-count").text(state.playerCards.length);
+        $("#round-text").text(gameState.round);
+        $("#card-count").text(gameState.playerCards.length);
         $("#card-limit").text(PLAYER_CARD_LIMIT);
 
         // 根据游戏状态更新按钮的可用性
         // 游戏未开始、已结束、正在进行异步操作或没有选择出战卡牌时禁用对战按钮
         // 正在进行异步操作时禁用开始游戏按钮
         // 游戏结束时禁用所有操作按钮
-        $("#battle-btn").prop("disabled", state.isBusy || !state.selectedCardId);
-        $("#start-game").prop("disabled", state.isBusy);
+        $("#battle-btn").prop("disabled", isBusy || !gameState.selectedCardId);
+        $("#start-game").prop("disabled", isBusy);
     }
 
     // 渲染手牌区
     // 如果玩家没有卡牌了，显示提示信息
     const cardsContainer = $("#player-cards");
-    if(state.playerCards.length === 0) {
+    if(gameState.playerCards.length === 0) {
         cardsContainer.html("<p>没有卡牌了，请重新开始游戏。</p>");
     }
     // 否则渲染玩家的卡牌列表
     else {
         cardsContainer.empty(); // 清空当前的卡牌显示
-        for (const card of state.playerCards) {
-            const cardEl = createCardElement(card, true, card.id === state.selectedCardId);
+        for (const card of gameState.playerCards) {
+            const cardEl = createCardElement(card, true, card.id === gameState.selectedCardId);
             cardsContainer.append(cardEl);
         }
     }
@@ -337,21 +335,21 @@ function render() {
     // 渲染对战区
     {
         // 渲染当前选择的出战卡牌和电脑的卡牌，不显示操作按钮，出战卡牌高亮显示
-        const selectedCard = findCardById(state.selectedCardId);
+        const selectedCard = findCardById(gameState.selectedCardId);
         $("#selected-card").empty().append(createCardElement(selectedCard, false, true));
-        $("#enemy-card").empty().append(createCardElement(state.enemyCard, false, false));
+        $("#enemy-card").empty().append(createCardElement(gameState.enemyCard, false, false));
     }
 
     // 根据 state.log 数组渲染日志
     {
         const logContainer = $("#log");
-        logContainer.empty();
+        logContainer.empty(); // 清空当前日志显示
 
-        const logs = Array.isArray(state.log) ? state.log : [];
-        logs.forEach((item) => {
-            const logItem = $("<li>").text(`[${item.time}] ${item.message}`);
-            logContainer.append(logItem);
-        });
+        for(let i = gameState.log.length - 1; i >= 0; i--) {
+            const logEntry = gameState.log[i];
+            const logEl = $("<p>").html(`<span class="timestamp">[${logEntry.time}]</span> ${logEntry.message}`);
+            logContainer.append(logEl);
+        }
     }
 }
 
@@ -359,7 +357,7 @@ function render() {
 $(function () {
 
     bindEvents();        // 绑定事件处理函数
-    initialState(state); // 初始化游戏状态
+    initialState(gameState); // 初始化游戏状态
     render();            // 初始渲染界面
 
     addLog("点击\"开始游戏\"以抽取初始卡牌");
