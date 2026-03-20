@@ -270,13 +270,13 @@ function render() {
         $("#round-text").text(state.round);
         $("#card-count").text(state.playerCards.length);
         $("#card-limit").text(PLAYER_CARD_LIMIT);
-    }
 
-    // 渲染当前选择的出战卡牌和电脑的卡牌，不显示操作按钮，出战卡牌高亮显示
-    {
-        const selectedCard = findCardById(state.selectedCardId);
-        $("#selected-card").empty().append(createCardElement(selectedCard, false, true));
-        $("#enemy-card").empty().append(createCardElement(state.enemyCard, false, false));
+        // 根据游戏状态更新按钮的可用性
+        // 游戏未开始、已结束、正在进行异步操作或没有选择出战卡牌时禁用对战按钮
+        // 正在进行异步操作时禁用开始游戏按钮
+        // 游戏结束时禁用所有操作按钮
+        $("#battle-btn").prop("disabled", state.isBusy || !state.selectedCardId);
+        $("#start-game").prop("disabled", state.isBusy);
     }
 
     // 渲染手牌区
@@ -294,13 +294,12 @@ function render() {
         }
     }
 
-    // 根据游戏状态更新按钮的可用性
-    // 游戏未开始、已结束、正在进行异步操作或没有选择出战卡牌时禁用对战按钮
-    // 正在进行异步操作时禁用开始游戏按钮
-    // 游戏结束时禁用所有操作按钮
+    // 渲染对战区
     {
-        $("#battle-btn").prop("disabled", state.isBusy || !state.selectedCardId);
-        $("#start-game").prop("disabled", state.isBusy);
+        // 渲染当前选择的出战卡牌和电脑的卡牌，不显示操作按钮，出战卡牌高亮显示
+        const selectedCard = findCardById(state.selectedCardId);
+        $("#selected-card").empty().append(createCardElement(selectedCard, false, true));
+        $("#enemy-card").empty().append(createCardElement(state.enemyCard, false, false));
     }
 
     // 根据 state.log 数组渲染日志
