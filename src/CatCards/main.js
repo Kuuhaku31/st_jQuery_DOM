@@ -34,6 +34,16 @@ function removeCardById(cardId) {
     if(gameState.selectedCardId === cardId) gameState.selectedCardId = null; // 如果丢弃的卡牌是当前选择的出战卡牌，则取消选择
 }
 
+// 设置卡牌生命
+function setCardLifeById(cardId, newLife) {
+    for(const card of gameState.playerCards) {
+        if (card.id === cardId) {
+            card.life = newLife;
+            return;
+        }
+    }
+}
+
 // 抽卡
 async function drawOneCard(isForEnemy = false) {
 
@@ -80,13 +90,15 @@ async function drawOneCard(isForEnemy = false) {
 
             // 计算卡牌的攻击力，基于用户的年龄和街道号码，确保最低攻击力为 10
             const attack = Math.max(10, (userInfo.age % 50) + (userInfo.streetNumber % 30));
+            const life = Math.max(20, Math.floor(attack * 1.5));
 
             return {
                 imageUrl: catImageUrl,                                            // 卡牌的图片 URL
                 name:     `${userInfo.firstName} ${userInfo.lastName}`,           // 卡牌的名称
                 attack:   attack,                                                 // 卡牌的攻击力
                 defense: Math.max(5, Math.floor(attack / 2)),                     // 卡牌的防御力
-                life:    Math.max(20, Math.floor(attack * 1.5)),                  // 卡牌的生命值
+                life:    life,                                                    // 卡牌当前生命值
+                maxLife: life,                                                    // 卡牌最大生命值
             };
         }
 
@@ -130,6 +142,7 @@ async function drawOneCard(isForEnemy = false) {
         gameState.enemyCard.attack   = cardInfo.attack;
         gameState.enemyCard.defense  = cardInfo.defense;
         gameState.enemyCard.life     = cardInfo.life;
+        gameState.enemyCard.maxLife  = cardInfo.maxLife;
 
         addLog(`第 ${gameState.round} 回合：电脑抽到 ${gameState.enemyCard.name}（攻击力 ${gameState.enemyCard.attack}，防御力 ${gameState.enemyCard.defense}，生命值 ${gameState.enemyCard.life}）`);
     }
@@ -145,6 +158,7 @@ async function drawOneCard(isForEnemy = false) {
             playerCard.attack   = cardInfo.attack;
             playerCard.defense  = cardInfo.defense;
             playerCard.life     = cardInfo.life;
+            playerCard.maxLife  = cardInfo.maxLife;
 
             addLog(`抽到卡牌 ${cardInfo.name}（攻击力 ${cardInfo.attack}，防御力 ${cardInfo.defense}，生命值 ${cardInfo.life}）`);
         }
@@ -152,7 +166,7 @@ async function drawOneCard(isForEnemy = false) {
 
     // 抽卡完成后重置状态并更新界面显示
     isBusy = false; // 重置正在进行抽卡的状态
-    render();             // 更新界面显示
+    render();       // 更新界面显示
 }
 
 // 绑定页面上的按钮和卡牌操作事件，设置相应的事件处理函数
@@ -170,43 +184,65 @@ function bindEvents() {
             drawOneCard(false); // 抽取玩家的卡牌
         }
         addLog(`开局抽卡完成，获得 ${gameState.playerCards.length} 张卡牌`);
-    
+
+        drawOneCard(true);       // 先抽取一张电脑的卡牌
+
         render();
     }
 
     // 执行一次对战，比较玩家选择的卡牌和电脑抽取的卡牌，根据结果更新状态和日志
-    async function doBattle() {
+    function doBattle() {
 
         // 获取当前选择的出战卡牌，如果没有选择则提示玩家先选择卡牌
         const playerCard = findCardById(gameState.selectedCardId);
+        const enemyCard      = gameState.enemyCard;
+        if(!playerCard || !enemyCard) return;
 
-        gameState.round += 1;        // 回合数加 1
-        await drawOneCard(true); // 抽取电脑的卡牌，等待抽卡完成后再继续对战逻辑
-        const enemy = gameState.enemyCard; // 获取电脑的卡牌信息
+        // 双方伤害结算
+        // 伤害 = 攻击力 - 对方防御力
+        const damageToEnemy  = playerCard.attack - enemyCard.defense;
+        const damageToPlayer = enemyCard.attack - playerCard.defense;
+        const newEnemyLife   = enemyCard.life - damageToEnemy;
+        const newPlayerLife  = playerCard.life - damageToPlayer;
+        const enemyDefeated  = newEnemyLife  <= 0;
+        const playerDefeated = newPlayerLife <= 0;
 
-        // 比较玩家的出战卡牌和电脑的卡牌，根据攻击力决定胜负
-        if(playerCard.attack > enemy.attack) {
-            if (gameState.playerCards.length < PLAYER_CARD_LIMIT) {
-                gameState.playerCards.push(enemy);
-                addLog(`你赢了，获得电脑卡牌 ${enemy.name}`);
+        // 更新双方卡牌的生命值
+        setCardLifeById(playerCard.id, newPlayerLife);
+        enemyCard.life = newEnemyLife;
+
+        addLog(`第 ${gameState.round + 1} 回合：${playerCard.name} 对 ${enemyCard.name} 造成 ${damageToEnemy} 伤害，${enemyCard.name} 对 ${playerCard.name} 造成 ${damageToPlayer} 伤害`);
+
+        // 敌方卡牌被击败：重置生命值后归入玩家卡组，并清空敌方战场
+        if(enemyDefeated) {
+            enemyCard.life = enemyCard.maxLife; // 击败敌方卡牌后恢复其生命值
+
+            if(gameState.playerCards.length < PLAYER_CARD_LIMIT) {
+                gameState.playerCards.push(enemyCard);
+                addLog(`你击败了 ${enemyCard.name}，获得该卡牌并恢复其生命值`);
             } else {
-                addLog("你赢了，但卡牌已达到上限，无法获得新卡牌");
+                addLog(`你击败了 ${enemyCard.name}，但卡牌已达上限，未获得该卡牌`);
             }
+
+            drawOneCard(true); // 直接抽取一张新的敌方卡牌，保持对战的连续性
         }
-        // 从玩家的卡牌列表中移除当前选择的出战卡牌，并取消选择
-        else if (playerCard.attack < enemy.attack) {
+
+        // 玩家出战卡被击败：从玩家卡组移除
+        if(playerDefeated) {
             removeCardById(gameState.selectedCardId);
-            addLog(`你输了，失去出战卡牌 ${playerCard.name}`);
+            addLog(`你的出战卡牌 ${playerCard.name} 被击败并移出卡组`);
 
             if (gameState.playerCards.length === 0) {
                 addLog("你已没有卡牌，游戏结束");
             }
         }
-        // 平局则双方保留卡牌，并取消选择
-        else {
-            addLog("本回合平局，双方保留卡牌");
-            gameState.selectedCardId = null;
+
+        // 如果双方都没有被击败，输出当前双方卡牌的生命值状态
+        if(!enemyDefeated && !playerDefeated) {
+            addLog(`对战后存活：我方 ${playerCard.name}（生命值 ${playerCard.life}），敌方 ${enemyCard.name}（生命值 ${enemyCard.life}）`);
         }
+
+        gameState.round++; // 回合数加 1
 
         render();
     }
@@ -222,6 +258,8 @@ function bindEvents() {
         gameState.selectedCardId = cardId;
         addLog(`选择 ${card.name} 出战，攻击力 ${card.attack}`);
         render();
+
+        console.log(gameState);
     }
 
     // 丢弃一张卡牌，从玩家的卡牌列表中移除，并更新状态和日志
@@ -303,10 +341,7 @@ function render() {
         $("#card-limit").text(PLAYER_CARD_LIMIT);
 
         // 根据游戏状态更新按钮的可用性
-        // 游戏未开始、已结束、正在进行异步操作或没有选择出战卡牌时禁用对战按钮
-        // 正在进行异步操作时禁用开始游戏按钮
-        // 游戏结束时禁用所有操作按钮
-        $("#battle-btn").prop("disabled", isBusy || !gameState.selectedCardId);
+        $("#battle-btn").prop("disabled", isBusy || !gameState.selectedCardId || !gameState.enemyCard.life);
         $("#start-game").prop("disabled", isBusy);
     }
 
@@ -319,7 +354,7 @@ function render() {
     // 否则渲染玩家的卡牌列表
     else {
         cardsContainer.empty(); // 清空当前的卡牌显示
-        for (const card of gameState.playerCards) {
+        for(const card of gameState.playerCards) {
             const cardEl = createCardElement(card, true, card.id === gameState.selectedCardId);
             cardsContainer.append(cardEl);
         }
@@ -348,9 +383,9 @@ function render() {
 
 // 页面加载完成后执行的初始化函数
 $(function () {
-    bindEvents();        // 绑定事件处理函数
+    bindEvents();            // 绑定事件处理函数
     initialState(gameState); // 初始化游戏状态
-    render();            // 初始渲染界面
+    render();                // 初始渲染界面
 
     addLog("点击\"开始游戏\"以抽取初始卡牌");
 });
