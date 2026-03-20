@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Cat Cards</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <main class="app">
+      <section class="panel header">
+        <h1>随机猫咪卡片大战</h1>
+        <div class="actions">
+          <button id="start-game">开始游戏</button>
+          <button id="battle-btn" class="secondary" disabled>开始对局</button>
+        </div>
+      </section>
+
+      <section class="panel status-grid">
+        <div class="status-item">
+          <div class="label">回合</div>
+          <div id="round-text" class="value">0</div>
+        </div>
+        <div class="status-item">
+          <div class="label">玩家卡牌数</div>
+          <div id="card-count" class="value">0</div>
+        </div>
+        <div class="status-item">
+          <div class="label">卡牌上限</div>
+          <div id="card-limit" class="value">8</div>
+        </div>
+      </section>
+
+      <section class="panel">
+        <h2>玩家卡组</h2>
+        <div id="player-cards" class="cards"></div>
+      </section>
+
+      <section id="battle-area" class="panel">
+        <div>
+          <h2>我方出战卡</h2>
+          <div id="selected-card"></div>
+        </div>
+        <div>
+          <h2>电脑卡牌</h2>
+          <div id="enemy-card"></div>
+        </div>
+      </section>
+
+      <section class="panel">
+        <h2>对战日志</h2>
+        <ul id="log"></ul>
+      </section>
+    </main>
+
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="./main.js"></script>
+  </body>
+</html>

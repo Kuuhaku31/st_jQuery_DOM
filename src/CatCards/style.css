@@ -1,0 +1,177 @@
+:root {
+  --bg: #f8fbff;
+  --panel: #ffffff;
+  --accent: #1d7f72;
+  --accent-soft: #d6f0ec;
+  --danger: #d94f4f;
+  --text: #1d2433;
+  --muted: #697386;
+  --shadow: 0 10px 30px rgba(19, 29, 53, 0.08);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  padding: 24px;
+  font-family: "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+  color: var(--text);
+  background: linear-gradient(160deg, #e7f8ff 0%, #f7fff8 100%);
+}
+
+.app {
+  max-width: 1100px;
+  margin: 0 auto;
+  display: grid;
+  gap: 16px;
+}
+
+.panel {
+  background: var(--panel);
+  border-radius: 14px;
+  box-shadow: var(--shadow);
+  padding: 16px;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+}
+
+h1 {
+  margin: 0;
+  font-size: 1.6rem;
+}
+
+.actions {
+  display: flex;
+  gap: 8px;
+}
+
+button {
+  border: none;
+  border-radius: 10px;
+  padding: 8px 12px;
+  cursor: pointer;
+  color: #fff;
+  background: var(--accent);
+  font-weight: 600;
+}
+
+button.secondary {
+  background: #50607f;
+}
+
+button.danger {
+  background: var(--danger);
+}
+
+button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.status-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.status-item {
+  background: var(--bg);
+  border: 1px solid #ebf0f5;
+  border-radius: 10px;
+  padding: 10px;
+}
+
+.status-item .label {
+  font-size: 0.85rem;
+  color: var(--muted);
+}
+
+.status-item .value {
+  font-size: 1.1rem;
+  font-weight: 700;
+}
+
+.cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 12px;
+}
+
+.card {
+  border: 1px solid #e8edf4;
+  border-radius: 12px;
+  overflow: hidden;
+  background: #fff;
+}
+
+.card.selected {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-soft);
+}
+
+.card img {
+  width: 100%;
+  height: 150px;
+  object-fit: cover;
+  display: block;
+}
+
+.card .content {
+  padding: 10px;
+}
+
+.card .name {
+  margin: 0 0 6px;
+  font-weight: 700;
+}
+
+.card .meta {
+  margin: 0;
+  color: var(--muted);
+}
+
+.card .card-actions {
+  margin-top: 10px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+#battle-area {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+#log {
+  margin: 0;
+  padding-left: 18px;
+  max-height: 220px;
+  overflow: auto;
+}
+
+#log li {
+  margin-bottom: 6px;
+  color: #2f3a52;
+}
+
+@media (max-width: 760px) {
+  body {
+    padding: 14px;
+  }
+
+  .status-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  #battle-area {
+    grid-template-columns: 1fr;
+  }
+}

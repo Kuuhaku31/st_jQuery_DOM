@@ -1,0 +1,363 @@
+<mxfile host="Electron" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) draw.io/29.3.6 Chrome/140.0.7339.249 Electron/38.8.0 Safari/537.36" version="29.3.6" pages="2">
+  <diagram name="第 1 页" id="QVHuF8r6l1RosZZOxT6C">
+    <mxGraphModel dx="2026" dy="2078" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="xho0p5imxTp_kGBHlJKi-1" parent="1" style="ellipse;shape=cloud;whiteSpace=wrap;html=1;fontFamily=Sarasa Fixed SC;" value="bgm.tv" vertex="1">
+          <mxGeometry height="80" width="226" x="240" y="160" as="geometry" />
+        </mxCell>
+        <mxCell id="xho0p5imxTp_kGBHlJKi-2" parent="1" style="rounded=0;whiteSpace=wrap;html=1;fontFamily=Sarasa Fixed SC;" value="api.bgm.tv" vertex="1">
+          <mxGeometry height="40" width="120" x="240" y="320" as="geometry" />
+        </mxCell>
+        <mxCell id="xho0p5imxTp_kGBHlJKi-4" edge="1" parent="1" source="xho0p5imxTp_kGBHlJKi-2" style="endArrow=none;html=1;rounded=0;fontFamily=Sarasa Fixed SC;" target="xho0p5imxTp_kGBHlJKi-1" value="">
+          <mxGeometry height="50" relative="1" width="50" as="geometry">
+            <mxPoint x="110" y="370" as="sourcePoint" />
+            <mxPoint x="160" y="320" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="xho0p5imxTp_kGBHlJKi-5" parent="1" style="rounded=0;whiteSpace=wrap;html=1;fontFamily=Sarasa Fixed SC;" value="v0/search/subjects" vertex="1">
+          <mxGeometry height="40" width="120" x="400" y="320" as="geometry" />
+        </mxCell>
+        <mxCell id="xho0p5imxTp_kGBHlJKi-7" parent="1" style="swimlane;whiteSpace=wrap;html=1;startSize=20;fontFamily=Sarasa Fixed SC;" value="Model" vertex="1">
+          <mxGeometry height="175" width="560" x="-640" y="425" as="geometry" />
+        </mxCell>
+        <mxCell id="xho0p5imxTp_kGBHlJKi-20" parent="xho0p5imxTp_kGBHlJKi-7" style="shape=process;whiteSpace=wrap;html=1;backgroundOutline=1;fontFamily=Sarasa Fixed SC;" value="GetAnimeInfo" vertex="1">
+          <mxGeometry height="40" width="280" x="40" y="80" as="geometry" />
+        </mxCell>
+        <mxCell id="xho0p5imxTp_kGBHlJKi-13" parent="1" style="swimlane;whiteSpace=wrap;html=1;startSize=20;fontFamily=Sarasa Fixed SC;" value="View" vertex="1">
+          <mxGeometry height="160" width="560" x="-640" y="680" as="geometry" />
+        </mxCell>
+        <mxCell id="xho0p5imxTp_kGBHlJKi-15" parent="1" style="swimlane;whiteSpace=wrap;html=1;startSize=20;fontFamily=Sarasa Fixed SC;" value="Anime Record" vertex="1">
+          <mxGeometry height="320" width="480" x="-410" y="-200" as="geometry" />
+        </mxCell>
+        <mxCell id="xho0p5imxTp_kGBHlJKi-17" parent="xho0p5imxTp_kGBHlJKi-15" style="rounded=0;whiteSpace=wrap;html=1;fontFamily=Sarasa Fixed SC;" value="Anime Viewing Status" vertex="1">
+          <mxGeometry height="40" width="120" x="40" y="120" as="geometry" />
+        </mxCell>
+        <mxCell id="xho0p5imxTp_kGBHlJKi-12" parent="xho0p5imxTp_kGBHlJKi-15" style="swimlane;whiteSpace=wrap;html=1;startSize=20;fontFamily=Sarasa Fixed SC;" value="Anime Info" vertex="1">
+          <mxGeometry height="240" width="200" x="200" y="40" as="geometry" />
+        </mxCell>
+        <mxCell id="xho0p5imxTp_kGBHlJKi-10" parent="xho0p5imxTp_kGBHlJKi-12" style="rounded=0;whiteSpace=wrap;html=1;fontFamily=Sarasa Fixed SC;" value="Anime Title" vertex="1">
+          <mxGeometry height="40" width="120" x="10" y="120" as="geometry" />
+        </mxCell>
+        <mxCell id="xho0p5imxTp_kGBHlJKi-11" parent="xho0p5imxTp_kGBHlJKi-12" style="rounded=0;whiteSpace=wrap;html=1;fontFamily=Sarasa Fixed SC;" value="Anime Air Time" vertex="1">
+          <mxGeometry height="40" width="120" x="30" y="170" as="geometry" />
+        </mxCell>
+        <mxCell id="xho0p5imxTp_kGBHlJKi-9" parent="xho0p5imxTp_kGBHlJKi-12" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#0050ef;fontColor=#ffffff;strokeColor=#001DBC;fontFamily=Sarasa Fixed SC;" value="Anime ID" vertex="1">
+          <mxGeometry height="40" width="120" x="50" y="50" as="geometry" />
+        </mxCell>
+        <mxCell id="xho0p5imxTp_kGBHlJKi-21" parent="1" style="rounded=0;whiteSpace=wrap;html=1;fontFamily=Sarasa Fixed SC;" value="输入关键词" vertex="1">
+          <mxGeometry height="40" width="120" x="200" y="760" as="geometry" />
+        </mxCell>
+        <mxCell id="xho0p5imxTp_kGBHlJKi-22" parent="1" style="shape=process;whiteSpace=wrap;html=1;backgroundOutline=1;fontFamily=Sarasa Fixed SC;size=0.027777777777777776;" value="List&amp;lt;AnimeInfo&amp;gt; SearchAnimeInfo(String keyword)" vertex="1">
+          <mxGeometry height="40" width="360" x="40" y="480" as="geometry" />
+        </mxCell>
+        <mxCell id="xho0p5imxTp_kGBHlJKi-23" edge="1" parent="1" source="xho0p5imxTp_kGBHlJKi-22" style="endArrow=classic;html=1;rounded=0;fontFamily=Sarasa Fixed SC;" target="xho0p5imxTp_kGBHlJKi-2" value="">
+          <mxGeometry height="50" relative="1" width="50" as="geometry">
+            <mxPoint x="240" y="680" as="sourcePoint" />
+            <mxPoint x="290" y="630" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="xho0p5imxTp_kGBHlJKi-25" parent="1" style="rounded=0;whiteSpace=wrap;html=1;fontFamily=Sarasa Fixed SC;" value="List&amp;lt;AnimeInfo&amp;gt; animeSearchResultList" vertex="1">
+          <mxGeometry height="40" width="320" x="480" y="480" as="geometry" />
+        </mxCell>
+        <mxCell id="xho0p5imxTp_kGBHlJKi-26" edge="1" parent="1" source="xho0p5imxTp_kGBHlJKi-2" style="endArrow=classic;html=1;rounded=0;fontFamily=Sarasa Fixed SC;" target="xho0p5imxTp_kGBHlJKi-25" value="">
+          <mxGeometry height="50" relative="1" width="50" as="geometry">
+            <mxPoint x="680" y="470" as="sourcePoint" />
+            <mxPoint x="650" y="350" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="xho0p5imxTp_kGBHlJKi-27" edge="1" parent="1" source="xho0p5imxTp_kGBHlJKi-21" style="endArrow=classic;html=1;rounded=0;fontFamily=Sarasa Fixed SC;" target="xho0p5imxTp_kGBHlJKi-22" value="">
+          <mxGeometry height="50" relative="1" width="50" as="geometry">
+            <mxPoint x="330" y="820" as="sourcePoint" />
+            <mxPoint x="300" y="700" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="xho0p5imxTp_kGBHlJKi-28" parent="1" style="rounded=0;whiteSpace=wrap;html=1;fontFamily=Sarasa Fixed SC;" value="显示搜索结果集" vertex="1">
+          <mxGeometry height="40" width="200" x="400" y="760" as="geometry" />
+        </mxCell>
+        <mxCell id="xho0p5imxTp_kGBHlJKi-29" edge="1" parent="1" source="xho0p5imxTp_kGBHlJKi-25" style="endArrow=classic;html=1;rounded=0;fontFamily=Sarasa Fixed SC;" target="xho0p5imxTp_kGBHlJKi-28" value="">
+          <mxGeometry height="50" relative="1" width="50" as="geometry">
+            <mxPoint x="550" y="730" as="sourcePoint" />
+            <mxPoint x="618" y="490" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="xho0p5imxTp_kGBHlJKi-8" parent="1" style="rounded=0;whiteSpace=wrap;html=1;fontFamily=Sarasa Fixed SC;strokeColor=default;align=center;verticalAlign=middle;fontSize=12;fontColor=default;fillColor=default;fontStyle=0" value="List&amp;lt;&lt;span style=&quot;&quot;&gt;AnimeRecord&lt;/span&gt;&amp;gt; animeRecordList" vertex="1">
+          <mxGeometry height="40" width="280" x="881" y="560" as="geometry" />
+        </mxCell>
+        <mxCell id="xho0p5imxTp_kGBHlJKi-30" edge="1" parent="1" source="xho0p5imxTp_kGBHlJKi-28" style="endArrow=classic;html=1;rounded=0;fontFamily=Sarasa Fixed SC;" target="xho0p5imxTp_kGBHlJKi-31" value="">
+          <mxGeometry height="50" relative="1" width="50" as="geometry">
+            <mxPoint x="664" y="670" as="sourcePoint" />
+            <mxPoint x="630" y="910" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="xho0p5imxTp_kGBHlJKi-31" parent="1" style="rounded=0;whiteSpace=wrap;html=1;fontFamily=Sarasa Fixed SC;" value="选择条目添加" vertex="1">
+          <mxGeometry height="40" width="120" x="801" y="760" as="geometry" />
+        </mxCell>
+        <mxCell id="xho0p5imxTp_kGBHlJKi-32" edge="1" parent="1" source="xho0p5imxTp_kGBHlJKi-31" style="endArrow=classic;html=1;rounded=0;fontFamily=Sarasa Fixed SC;" target="xho0p5imxTp_kGBHlJKi-8" value="">
+          <mxGeometry height="50" relative="1" width="50" as="geometry">
+            <mxPoint x="911" y="840" as="sourcePoint" />
+            <mxPoint x="1097" y="760" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="xho0p5imxTp_kGBHlJKi-34" parent="1" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;rounded=0;fontFamily=Sarasa Fixed SC;" value="数据结构" vertex="1">
+          <mxGeometry height="30" width="60" x="-370" y="-290" as="geometry" />
+        </mxCell>
+        <mxCell id="xho0p5imxTp_kGBHlJKi-35" parent="1" style="rounded=0;whiteSpace=wrap;html=1;fontFamily=Sarasa Fixed SC;" value="显示本地结果集" vertex="1">
+          <mxGeometry height="40" width="200" x="1041" y="760" as="geometry" />
+        </mxCell>
+        <mxCell id="xho0p5imxTp_kGBHlJKi-36" edge="1" parent="1" source="xho0p5imxTp_kGBHlJKi-35" style="endArrow=classic;startArrow=classic;html=1;rounded=0;fontFamily=Sarasa Fixed SC;" target="xho0p5imxTp_kGBHlJKi-8" value="">
+          <mxGeometry height="50" relative="1" width="50" as="geometry">
+            <mxPoint x="1281" y="620" as="sourcePoint" />
+            <mxPoint x="1331" y="570" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="xho0p5imxTp_kGBHlJKi-37" connectable="0" parent="xho0p5imxTp_kGBHlJKi-36" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" value="Text" vertex="1">
+          <mxGeometry relative="1" x="0.0281" y="-1" as="geometry">
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+  <diagram id="KHa75qwO3kikywLdpnrL" name="第 2 页">
+    <mxGraphModel dx="528" dy="862" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="9dlEiOIW6Am2YRyyapP8-1" parent="1" style="rounded=0;whiteSpace=wrap;html=1;fontFamily=Sarasa Fixed SC;" value="playerCardList" vertex="1">
+          <mxGeometry height="40" width="320" x="120" y="920" as="geometry" />
+        </mxCell>
+        <mxCell id="jof5RuqXhbj7nGECx91f-1" parent="1" style="ellipse;shape=cloud;whiteSpace=wrap;html=1;fontFamily=Sarasa Fixed SC;" value="Cat API" vertex="1">
+          <mxGeometry height="80" width="120" x="450" y="300" as="geometry" />
+        </mxCell>
+        <mxCell id="jof5RuqXhbj7nGECx91f-2" parent="1" style="ellipse;shape=cloud;whiteSpace=wrap;html=1;fontFamily=Sarasa Fixed SC;" value="&lt;div&gt;Random User&lt;/div&gt;" vertex="1">
+          <mxGeometry height="80" width="120" x="760" y="290" as="geometry" />
+        </mxCell>
+        <mxCell id="jof5RuqXhbj7nGECx91f-3" parent="1" style="rounded=0;whiteSpace=wrap;html=1;fontFamily=Sarasa Fixed SC;" value="cat url" vertex="1">
+          <mxGeometry height="40" width="120" x="440" y="440" as="geometry" />
+        </mxCell>
+        <mxCell id="jof5RuqXhbj7nGECx91f-5" edge="1" parent="1" source="jof5RuqXhbj7nGECx91f-1" style="endArrow=classic;html=1;rounded=0;fontFamily=Sarasa Fixed SC;" target="jof5RuqXhbj7nGECx91f-3" value="">
+          <mxGeometry height="50" relative="1" width="50" as="geometry">
+            <mxPoint x="690" y="450" as="sourcePoint" />
+            <mxPoint x="740" y="400" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="jof5RuqXhbj7nGECx91f-6" parent="1" style="rounded=0;whiteSpace=wrap;html=1;fontFamily=Sarasa Fixed SC;" value="user info" vertex="1">
+          <mxGeometry height="40" width="120" x="720" y="440" as="geometry" />
+        </mxCell>
+        <mxCell id="jof5RuqXhbj7nGECx91f-7" edge="1" parent="1" source="jof5RuqXhbj7nGECx91f-2" style="endArrow=classic;html=1;rounded=0;fontFamily=Sarasa Fixed SC;" target="jof5RuqXhbj7nGECx91f-6" value="">
+          <mxGeometry height="50" relative="1" width="50" as="geometry">
+            <mxPoint x="705" y="370" as="sourcePoint" />
+            <mxPoint x="700" y="430" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="jof5RuqXhbj7nGECx91f-9" parent="1" style="swimlane;whiteSpace=wrap;html=1;startSize=20;fontFamily=Sarasa Fixed SC;" value="Player Card" vertex="1">
+          <mxGeometry height="440" width="200" x="1330" y="220" as="geometry" />
+        </mxCell>
+        <mxCell id="jof5RuqXhbj7nGECx91f-8" parent="jof5RuqXhbj7nGECx91f-9" style="rounded=0;whiteSpace=wrap;html=1;fontFamily=Sarasa Fixed SC;" value="ID" vertex="1">
+          <mxGeometry height="40" width="120" x="40" y="40" as="geometry" />
+        </mxCell>
+        <mxCell id="jof5RuqXhbj7nGECx91f-10" parent="jof5RuqXhbj7nGECx91f-9" style="rounded=0;whiteSpace=wrap;html=1;fontFamily=Sarasa Fixed SC;" value="icon" vertex="1">
+          <mxGeometry height="40" width="120" x="40" y="120" as="geometry" />
+        </mxCell>
+        <mxCell id="jof5RuqXhbj7nGECx91f-11" parent="jof5RuqXhbj7nGECx91f-9" style="rounded=0;whiteSpace=wrap;html=1;fontFamily=Sarasa Fixed SC;" value="info" vertex="1">
+          <mxGeometry height="40" width="120" x="40" y="200" as="geometry" />
+        </mxCell>
+        <mxCell id="jof5RuqXhbj7nGECx91f-12" parent="jof5RuqXhbj7nGECx91f-9" style="rounded=0;whiteSpace=wrap;html=1;fontFamily=Sarasa Fixed SC;" value="att" vertex="1">
+          <mxGeometry height="40" width="120" x="40" y="280" as="geometry" />
+        </mxCell>
+        <mxCell id="jof5RuqXhbj7nGECx91f-13" parent="jof5RuqXhbj7nGECx91f-9" style="rounded=0;whiteSpace=wrap;html=1;fontFamily=Sarasa Fixed SC;" value="def" vertex="1">
+          <mxGeometry height="40" width="120" x="40" y="360" as="geometry" />
+        </mxCell>
+        <mxCell id="jof5RuqXhbj7nGECx91f-14" parent="1" style="rounded=0;whiteSpace=wrap;html=1;fontFamily=Sarasa Fixed SC;" value="显示所有卡片" vertex="1">
+          <mxGeometry height="40" width="320" x="120" y="1080" as="geometry" />
+        </mxCell>
+        <mxCell id="jof5RuqXhbj7nGECx91f-15" edge="1" parent="1" source="jof5RuqXhbj7nGECx91f-14" style="endArrow=classic;startArrow=classic;html=1;rounded=0;fontFamily=Sarasa Fixed SC;" target="9dlEiOIW6Am2YRyyapP8-1" value="">
+          <mxGeometry height="50" relative="1" width="50" as="geometry">
+            <mxPoint x="20" y="890" as="sourcePoint" />
+            <mxPoint x="70" y="840" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="jof5RuqXhbj7nGECx91f-17" parent="1" style="shape=process;whiteSpace=wrap;html=1;backgroundOutline=1;fontFamily=Sarasa Fixed SC;" value="async&amp;nbsp;drawOneCard()" vertex="1">
+          <mxGeometry height="40" width="160" x="480" y="720" as="geometry" />
+        </mxCell>
+        <mxCell id="jof5RuqXhbj7nGECx91f-18" edge="1" parent="1" source="jof5RuqXhbj7nGECx91f-17" style="endArrow=classic;html=1;rounded=0;fontFamily=Sarasa Fixed SC;" target="jof5RuqXhbj7nGECx91f-3" value="">
+          <mxGeometry height="50" relative="1" width="50" as="geometry">
+            <mxPoint x="600" y="640" as="sourcePoint" />
+            <mxPoint x="650" y="590" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="jof5RuqXhbj7nGECx91f-19" edge="1" parent="1" source="jof5RuqXhbj7nGECx91f-17" style="endArrow=classic;html=1;rounded=0;fontFamily=Sarasa Fixed SC;" target="jof5RuqXhbj7nGECx91f-6" value="">
+          <mxGeometry height="50" relative="1" width="50" as="geometry">
+            <mxPoint x="682" y="800" as="sourcePoint" />
+            <mxPoint x="630" y="560" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="jof5RuqXhbj7nGECx91f-22" edge="1" parent="1" source="jof5RuqXhbj7nGECx91f-20" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;fontFamily=Sarasa Fixed SC;" target="jof5RuqXhbj7nGECx91f-21" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="jof5RuqXhbj7nGECx91f-20" parent="1" style="rounded=0;whiteSpace=wrap;html=1;fontFamily=Sarasa Fixed SC;" value="开始" vertex="1">
+          <mxGeometry height="40" width="120" x="1121" y="680" as="geometry" />
+        </mxCell>
+        <mxCell id="jof5RuqXhbj7nGECx91f-24" edge="1" parent="1" source="jof5RuqXhbj7nGECx91f-21" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;fontFamily=Sarasa Fixed SC;" target="jof5RuqXhbj7nGECx91f-31">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="jof5RuqXhbj7nGECx91f-21" parent="1" style="whiteSpace=wrap;html=1;rounded=0;fontFamily=Sarasa Fixed SC;" value="初始抽卡" vertex="1">
+          <mxGeometry height="40" width="120" x="1121" y="760" as="geometry" />
+        </mxCell>
+        <mxCell id="jof5RuqXhbj7nGECx91f-26" edge="1" parent="1" source="jof5RuqXhbj7nGECx91f-23" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;fontFamily=Sarasa Fixed SC;" target="jof5RuqXhbj7nGECx91f-25">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="jof5RuqXhbj7nGECx91f-23" parent="1" style="whiteSpace=wrap;html=1;rounded=0;fontFamily=Sarasa Fixed SC;" value="开始对局" vertex="1">
+          <mxGeometry height="40" width="120" x="1121" y="920" as="geometry" />
+        </mxCell>
+        <mxCell id="jof5RuqXhbj7nGECx91f-28" edge="1" parent="1" source="jof5RuqXhbj7nGECx91f-25" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;fontFamily=Sarasa Fixed SC;" target="jof5RuqXhbj7nGECx91f-27">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="jof5RuqXhbj7nGECx91f-25" parent="1" style="whiteSpace=wrap;html=1;rounded=0;fontFamily=Sarasa Fixed SC;" value="抽卡决定对手" vertex="1">
+          <mxGeometry height="40" width="120" x="1121" y="1000" as="geometry" />
+        </mxCell>
+        <mxCell id="jof5RuqXhbj7nGECx91f-33" edge="1" parent="1" source="jof5RuqXhbj7nGECx91f-27" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;fontFamily=Sarasa Fixed SC;" target="jof5RuqXhbj7nGECx91f-29">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="jof5RuqXhbj7nGECx91f-35" connectable="0" parent="jof5RuqXhbj7nGECx91f-33" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];fontFamily=Sarasa Fixed SC;" value="胜" vertex="1">
+          <mxGeometry relative="1" x="-0.3974" y="-1" as="geometry">
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="jof5RuqXhbj7nGECx91f-34" edge="1" parent="1" source="jof5RuqXhbj7nGECx91f-27" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;fontFamily=Sarasa Fixed SC;" target="jof5RuqXhbj7nGECx91f-30">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="jof5RuqXhbj7nGECx91f-36" connectable="0" parent="jof5RuqXhbj7nGECx91f-34" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];fontFamily=Sarasa Fixed SC;" value="负" vertex="1">
+          <mxGeometry relative="1" x="-0.6015" y="-2" as="geometry">
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="jof5RuqXhbj7nGECx91f-27" parent="1" style="rhombus;whiteSpace=wrap;html=1;fontFamily=Sarasa Fixed SC;" value="对局" vertex="1">
+          <mxGeometry height="40" width="120" x="1121" y="1120" as="geometry" />
+        </mxCell>
+        <mxCell id="jof5RuqXhbj7nGECx91f-37" edge="1" parent="1" source="jof5RuqXhbj7nGECx91f-29" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;fontFamily=Sarasa Fixed SC;" target="jof5RuqXhbj7nGECx91f-31">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="1181" y="1280" />
+              <mxPoint x="960" y="1280" />
+              <mxPoint x="960" y="860" />
+            </Array>
+            <mxPoint x="1010" y="1050" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="jof5RuqXhbj7nGECx91f-29" parent="1" style="whiteSpace=wrap;html=1;rounded=0;fontFamily=Sarasa Fixed SC;" value="获得对手牌" vertex="1">
+          <mxGeometry height="40" width="120" x="1121" y="1200" as="geometry" />
+        </mxCell>
+        <mxCell id="jof5RuqXhbj7nGECx91f-43" edge="1" parent="1" source="jof5RuqXhbj7nGECx91f-30" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;fontFamily=Sarasa Fixed SC;" target="jof5RuqXhbj7nGECx91f-39">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="jof5RuqXhbj7nGECx91f-30" parent="1" style="whiteSpace=wrap;html=1;rounded=0;fontFamily=Sarasa Fixed SC;" value="失去出战牌" vertex="1">
+          <mxGeometry height="40" width="120" x="1280" y="1200" as="geometry" />
+        </mxCell>
+        <mxCell id="jof5RuqXhbj7nGECx91f-32" edge="1" parent="1" source="jof5RuqXhbj7nGECx91f-31" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;fontFamily=Sarasa Fixed SC;" target="jof5RuqXhbj7nGECx91f-23">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="jof5RuqXhbj7nGECx91f-31" parent="1" style="whiteSpace=wrap;html=1;rounded=0;fontFamily=Sarasa Fixed SC;" value="决定出战牌" vertex="1">
+          <mxGeometry height="40" width="120" x="1121" y="840" as="geometry" />
+        </mxCell>
+        <mxCell id="jof5RuqXhbj7nGECx91f-40" edge="1" parent="1" source="jof5RuqXhbj7nGECx91f-39" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;fontFamily=Sarasa Fixed SC;" target="jof5RuqXhbj7nGECx91f-31">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="1340" y="1360" />
+              <mxPoint x="960" y="1360" />
+              <mxPoint x="960" y="860" />
+            </Array>
+            <mxPoint x="920.0000000000002" y="1190" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="jof5RuqXhbj7nGECx91f-45" connectable="0" parent="jof5RuqXhbj7nGECx91f-40" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];fontFamily=Sarasa Fixed SC;" value="是" vertex="1">
+          <mxGeometry relative="1" x="-0.9596" y="3" as="geometry">
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="jof5RuqXhbj7nGECx91f-44" edge="1" parent="1" source="jof5RuqXhbj7nGECx91f-39" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;fontFamily=Sarasa Fixed SC;" target="jof5RuqXhbj7nGECx91f-42">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="1440" y="1300" />
+              <mxPoint x="1440" y="1400" />
+              <mxPoint x="1181" y="1400" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="jof5RuqXhbj7nGECx91f-46" connectable="0" parent="jof5RuqXhbj7nGECx91f-44" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];fontFamily=Sarasa Fixed SC;" value="否" vertex="1">
+          <mxGeometry relative="1" x="-0.9036" y="1" as="geometry">
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="jof5RuqXhbj7nGECx91f-39" parent="1" style="rhombus;whiteSpace=wrap;html=1;fontFamily=Sarasa Fixed SC;" value="我方还有牌" vertex="1">
+          <mxGeometry height="40" width="120" x="1280" y="1280" as="geometry" />
+        </mxCell>
+        <mxCell id="jof5RuqXhbj7nGECx91f-42" parent="1" style="whiteSpace=wrap;html=1;rounded=0;fontFamily=Sarasa Fixed SC;" value="结束" vertex="1">
+          <mxGeometry height="40" width="120" x="1121" y="1440" as="geometry" />
+        </mxCell>
+        <mxCell id="jof5RuqXhbj7nGECx91f-47" parent="1" style="rounded=0;whiteSpace=wrap;html=1;fontFamily=Sarasa Fixed SC;" value="出战牌" vertex="1">
+          <mxGeometry height="40" width="160" x="520" y="920" as="geometry" />
+        </mxCell>
+        <mxCell id="jof5RuqXhbj7nGECx91f-48" parent="1" style="rounded=0;whiteSpace=wrap;html=1;fontFamily=Sarasa Fixed SC;" value="对手牌" vertex="1">
+          <mxGeometry height="40" width="160" x="720" y="920" as="geometry" />
+        </mxCell>
+        <mxCell id="ihevKxX1y6ooeMHkEVEN-1" parent="1" style="shape=process;whiteSpace=wrap;html=1;backgroundOutline=1;fontFamily=Sarasa Fixed SC;" value="render()" vertex="1">
+          <mxGeometry height="40" width="160" x="400" y="1640" as="geometry" />
+        </mxCell>
+        <mxCell id="ihevKxX1y6ooeMHkEVEN-2" parent="1" style="whiteSpace=wrap;html=1;rounded=0;fontFamily=Sarasa Fixed SC;" value="createCardElement" vertex="1">
+          <mxGeometry height="40" width="120" x="520" y="1560" as="geometry" />
+        </mxCell>
+        <mxCell id="ihevKxX1y6ooeMHkEVEN-4" edge="1" parent="1" source="ihevKxX1y6ooeMHkEVEN-1" style="endArrow=classic;html=1;rounded=0;" target="ihevKxX1y6ooeMHkEVEN-2" value="">
+          <mxGeometry height="50" relative="1" width="50" as="geometry">
+            <mxPoint x="730" y="1810" as="sourcePoint" />
+            <mxPoint x="780" y="1760" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="ihevKxX1y6ooeMHkEVEN-5" parent="1" style="whiteSpace=wrap;html=1;rounded=0;fontFamily=Sarasa Fixed SC;" value="更新游戏状态显示" vertex="1">
+          <mxGeometry height="40" width="120" x="560" y="1720" as="geometry" />
+        </mxCell>
+        <mxCell id="ihevKxX1y6ooeMHkEVEN-6" parent="1" style="whiteSpace=wrap;html=1;rounded=0;fontFamily=Sarasa Fixed SC;" value="渲染手牌区" vertex="1">
+          <mxGeometry height="40" width="120" x="560" y="1800" as="geometry" />
+        </mxCell>
+        <mxCell id="ihevKxX1y6ooeMHkEVEN-7" parent="1" style="whiteSpace=wrap;html=1;rounded=0;fontFamily=Sarasa Fixed SC;" value="渲染对战区" vertex="1">
+          <mxGeometry height="40" width="120" x="560" y="1880" as="geometry" />
+        </mxCell>
+        <mxCell id="ihevKxX1y6ooeMHkEVEN-8" parent="1" style="whiteSpace=wrap;html=1;rounded=0;fontFamily=Sarasa Fixed SC;" value="渲染日志" vertex="1">
+          <mxGeometry height="40" width="120" x="560" y="1960" as="geometry" />
+        </mxCell>
+        <mxCell id="ihevKxX1y6ooeMHkEVEN-9" edge="1" parent="1" style="endArrow=none;html=1;rounded=0;entryX=0.5;entryY=1;entryDx=0;entryDy=0;" target="ihevKxX1y6ooeMHkEVEN-1" value="">
+          <mxGeometry height="50" relative="1" width="50" as="geometry">
+            <mxPoint x="480" y="1980" as="sourcePoint" />
+            <mxPoint x="560" y="1780" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="ihevKxX1y6ooeMHkEVEN-11" edge="1" parent="1" style="endArrow=none;html=1;rounded=0;" value="">
+          <mxGeometry height="50" relative="1" width="50" as="geometry">
+            <mxPoint x="480" y="1739.68" as="sourcePoint" />
+            <mxPoint x="560" y="1739.68" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="ihevKxX1y6ooeMHkEVEN-12" edge="1" parent="1" style="endArrow=none;html=1;rounded=0;" value="">
+          <mxGeometry height="50" relative="1" width="50" as="geometry">
+            <mxPoint x="480" y="1819.68" as="sourcePoint" />
+            <mxPoint x="560" y="1819.68" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="ihevKxX1y6ooeMHkEVEN-13" edge="1" parent="1" style="endArrow=none;html=1;rounded=0;" value="">
+          <mxGeometry height="50" relative="1" width="50" as="geometry">
+            <mxPoint x="480" y="1900" as="sourcePoint" />
+            <mxPoint x="560" y="1900" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="ihevKxX1y6ooeMHkEVEN-14" edge="1" parent="1" style="endArrow=none;html=1;rounded=0;" value="">
+          <mxGeometry height="50" relative="1" width="50" as="geometry">
+            <mxPoint x="480" y="1980" as="sourcePoint" />
+            <mxPoint x="560" y="1980" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
