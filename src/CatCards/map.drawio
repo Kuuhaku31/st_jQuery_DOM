@@ -121,7 +121,7 @@
     </mxGraphModel>
   </diagram>
   <diagram id="KHa75qwO3kikywLdpnrL" name="第 2 页">
-    <mxGraphModel dx="363" dy="862" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
+    <mxGraphModel dx="1269" dy="907" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
@@ -152,16 +152,16 @@
             <mxPoint x="700" y="430" as="targetPoint" />
           </mxGeometry>
         </mxCell>
-        <mxCell id="jof5RuqXhbj7nGECx91f-9" parent="1" style="swimlane;whiteSpace=wrap;html=1;startSize=20;fontFamily=Sarasa Fixed SC;" value="Player Card" vertex="1">
-          <mxGeometry height="440" width="200" x="1330" y="220" as="geometry" />
+        <mxCell id="jof5RuqXhbj7nGECx91f-9" parent="1" style="swimlane;whiteSpace=wrap;html=1;startSize=20;fontFamily=Sarasa Fixed SC;" value="Cat&amp;nbsp;&lt;span style=&quot;background-color: transparent; color: light-dark(rgb(0, 0, 0), rgb(255, 255, 255));&quot;&gt;Card&lt;/span&gt;" vertex="1">
+          <mxGeometry height="440" width="600" x="880" y="1560" as="geometry" />
         </mxCell>
-        <mxCell id="jof5RuqXhbj7nGECx91f-8" parent="jof5RuqXhbj7nGECx91f-9" style="rounded=0;whiteSpace=wrap;html=1;fontFamily=Sarasa Fixed SC;" value="ID" vertex="1">
+        <mxCell id="jof5RuqXhbj7nGECx91f-8" parent="jof5RuqXhbj7nGECx91f-9" style="rounded=0;whiteSpace=wrap;html=1;fontFamily=Sarasa Fixed SC;fillColor=#0050ef;fontColor=#ffffff;strokeColor=#001DBC;" value="ID" vertex="1">
           <mxGeometry height="40" width="120" x="40" y="40" as="geometry" />
         </mxCell>
-        <mxCell id="jof5RuqXhbj7nGECx91f-10" parent="jof5RuqXhbj7nGECx91f-9" style="rounded=0;whiteSpace=wrap;html=1;fontFamily=Sarasa Fixed SC;" value="icon" vertex="1">
+        <mxCell id="jof5RuqXhbj7nGECx91f-10" parent="jof5RuqXhbj7nGECx91f-9" style="rounded=0;whiteSpace=wrap;html=1;fontFamily=Sarasa Fixed SC;" value="img url" vertex="1">
           <mxGeometry height="40" width="120" x="40" y="120" as="geometry" />
         </mxCell>
-        <mxCell id="jof5RuqXhbj7nGECx91f-11" parent="jof5RuqXhbj7nGECx91f-9" style="rounded=0;whiteSpace=wrap;html=1;fontFamily=Sarasa Fixed SC;" value="info" vertex="1">
+        <mxCell id="jof5RuqXhbj7nGECx91f-11" parent="jof5RuqXhbj7nGECx91f-9" style="rounded=0;whiteSpace=wrap;html=1;fontFamily=Sarasa Fixed SC;" value="name" vertex="1">
           <mxGeometry height="40" width="120" x="40" y="200" as="geometry" />
         </mxCell>
         <mxCell id="jof5RuqXhbj7nGECx91f-12" parent="jof5RuqXhbj7nGECx91f-9" style="rounded=0;whiteSpace=wrap;html=1;fontFamily=Sarasa Fixed SC;" value="att" vertex="1">
@@ -169,6 +169,9 @@
         </mxCell>
         <mxCell id="jof5RuqXhbj7nGECx91f-13" parent="jof5RuqXhbj7nGECx91f-9" style="rounded=0;whiteSpace=wrap;html=1;fontFamily=Sarasa Fixed SC;" value="def" vertex="1">
           <mxGeometry height="40" width="120" x="40" y="360" as="geometry" />
+        </mxCell>
+        <mxCell id="ihevKxX1y6ooeMHkEVEN-16" parent="jof5RuqXhbj7nGECx91f-9" style="rounded=0;whiteSpace=wrap;html=1;fontFamily=Sarasa Fixed SC;" value="life" vertex="1">
+          <mxGeometry height="40" width="120" x="240" y="200" as="geometry" />
         </mxCell>
         <mxCell id="jof5RuqXhbj7nGECx91f-14" parent="1" style="rounded=0;whiteSpace=wrap;html=1;fontFamily=Sarasa Fixed SC;" value="显示所有卡片" vertex="1">
           <mxGeometry height="40" width="320" x="120" y="1080" as="geometry" />

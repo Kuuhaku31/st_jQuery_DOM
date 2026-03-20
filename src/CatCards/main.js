@@ -85,6 +85,8 @@ async function drawOneCard(isForEnemy = false) {
                 imageUrl: catImageUrl,                                            // 卡牌的图片 URL
                 name:     `${userInfo.firstName} ${userInfo.lastName}`,           // 卡牌的名称
                 attack:   attack,                                                 // 卡牌的攻击力
+                defense: Math.max(5, Math.floor(attack / 2)),                     // 卡牌的防御力
+                life:    Math.max(20, Math.floor(attack * 1.5)),                  // 卡牌的生命值
             };
         }
 
@@ -108,15 +110,10 @@ async function drawOneCard(isForEnemy = false) {
     isBusy = true; // 设置正在进行抽卡的状态，禁用相关按钮
 
     const newCardID = `card-${gameState.cardID++}`; // 生成新的卡牌 ID
-    const newCard = {
-        id:       newCardID, // 使用生成的卡牌 ID
-        imageUrl: null,
-        name:     null,
-        attack:   null,
-    };
+    const newCard   = { id: newCardID, };           // 使用生成的卡牌 ID
 
-    if(isForEnemy) gameState.enemyCard = newCard; // 更新电脑的卡牌状态以显示在界面上
-    else gameState.playerCards.push(newCard); // 将新卡牌添加到玩家的卡牌列表中
+    if(isForEnemy) gameState.enemyCard = newCard;       // 更新电脑的卡牌状态以显示在界面上
+    else           gameState.playerCards.push(newCard); // 将新卡牌添加到玩家的卡牌列表中
 
     render();
 
@@ -131,8 +128,10 @@ async function drawOneCard(isForEnemy = false) {
         gameState.enemyCard.imageUrl = cardInfo.imageUrl;
         gameState.enemyCard.name     = cardInfo.name;
         gameState.enemyCard.attack   = cardInfo.attack;
+        gameState.enemyCard.defense  = cardInfo.defense;
+        gameState.enemyCard.life     = cardInfo.life;
 
-        addLog(`第 ${gameState.round} 回合：电脑抽到 ${gameState.enemyCard.name}（攻击力 ${gameState.enemyCard.attack}）`);
+        addLog(`第 ${gameState.round} 回合：电脑抽到 ${gameState.enemyCard.name}（攻击力 ${gameState.enemyCard.attack}，防御力 ${gameState.enemyCard.defense}，生命值 ${gameState.enemyCard.life}）`);
     }
 
     // 如果为玩家抽卡
@@ -144,8 +143,10 @@ async function drawOneCard(isForEnemy = false) {
             playerCard.imageUrl = cardInfo.imageUrl;
             playerCard.name     = cardInfo.name;
             playerCard.attack   = cardInfo.attack;
+            playerCard.defense  = cardInfo.defense;
+            playerCard.life     = cardInfo.life;
 
-            addLog(`抽到卡牌 ${cardInfo.name}（攻击力 ${cardInfo.attack}）`);
+            addLog(`抽到卡牌 ${cardInfo.name}（攻击力 ${cardInfo.attack}，防御力 ${cardInfo.defense}，生命值 ${cardInfo.life}）`);
         }
     }
 
@@ -270,10 +271,12 @@ function render() {
         // 创建卡牌的图片元素
         const imageEl = $("<img>").attr("src", card.imageUrl).attr("alt", card.name);
 
-        // 创建卡牌内容元素，包括名称和攻击力
+        // 创建卡牌内容元素，包括名称和攻击力、防御力、生命值
         const contentEl = $("<div>").addClass("content");
         const nameEl    = $("<p>")  .addClass("name").text(card.name);
         const metaEl    = $("<p>")  .addClass("meta").html(`攻击力: <strong>${card.attack}</strong>`);
+        metaEl.append(`<br>防御力: <strong>${card.defense}</strong>`);
+        metaEl.append(`<br>生命值: <strong>${card.life}</strong>`);
 
         // 将名称和攻击力添加到内容元素中
         contentEl.append(nameEl, metaEl);
