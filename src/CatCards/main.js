@@ -1,13 +1,30 @@
 
 const INITIAL_DRAW_COUNT = 3;
 const PLAYER_CARD_LIMIT = 8;
+const GAME_STATE_STORAGE_KEY = "cat-cards-game-state";
 
-const gameState = {};    // 游戏状态对象
-let   isBusy    = false; // 是否正在进行异步操作（如抽卡或对战）
+let gameState = {};    // 游戏状态对象
+let isBusy    = false; // 是否正在进行异步操作（如抽卡或对战）
 
 // 统一记录游戏日志，集中渲染到日志面板
 function addGameLog(message) {
     gameState.log.push(message);
+}
+
+// 将 gameState 保存到 localStorage
+function saveGameState() {
+    localStorage.setItem(GAME_STATE_STORAGE_KEY, JSON.stringify(gameState));
+}
+
+// 尝试从 localStorage 恢复 gameState，成功返回 true
+function loadGameState() {
+    const raw = localStorage.getItem(GAME_STATE_STORAGE_KEY);
+    if(!raw) return false;
+
+    const savedState = JSON.parse(raw);
+    if(!savedState || typeof savedState !== "object") return false;
+    gameState = savedState;
+    return true;
 }
 
 // 获取初始状态对象的函数，返回一个新的状态对象
@@ -18,9 +35,9 @@ function initialState(gameState) {
     gameState.enemyCard      = null;   // 电脑当前的卡牌
     gameState.round          = 0;      // 当前回合数
     gameState.log            = [];     // 游戏日志
-    gameState.sortBy         = gameState.sortBy || "none"; // 玩家卡牌排序字段
-    gameState.sortOrder      = gameState.sortOrder || "desc"; // 玩家卡牌排序方向
-    gameState.filterAliveOnly = gameState.filterAliveOnly || false; // 是否仅显示生命值大于0的卡牌
+    gameState.sortBy         = "none"; // 玩家卡牌排序字段
+    gameState.sortOrder      = "desc"; // 玩家卡牌排序方向
+    gameState.filterAliveOnly = false; // 是否仅显示生命值大于0的卡牌
 }
 
 // 根据当前筛选与排序设置返回用于显示的卡牌数组（不修改原数组）
@@ -131,20 +148,11 @@ async function drawOneCard(isForEnemy = false) {
         }
 
         // 发起两个 API 请求，等待它们都完成后再创建卡牌对象
-        try {
+        const catImageUrl = await getCatImageUrl();
+        const userInfo    = await getUserInfo();
+        const newCardInfo = makeCardInfo(catImageUrl, userInfo);
 
-            const catImageUrl = await getCatImageUrl();
-            const userInfo    = await getUserInfo();
-            const newCardInfo = makeCardInfo(catImageUrl, userInfo);
-
-            return newCardInfo;
-        }
-
-        // 如果在获取卡牌信息的过程中发生任何错误
-        catch (error) {
-            console.error("Error fetching card info:", error);
-            return null;
-        }
+        return newCardInfo;
     }
 
     isBusy = true; // 设置正在进行抽卡的状态，禁用相关按钮
@@ -423,11 +431,14 @@ function render() {
         $("#selected-card").empty().append(createCardElement(selectedCard, false, true));
         $("#enemy-card").empty().append(createCardElement(gameState.enemyCard, false, false));
     }
+
+    // 每次界面刷新后持久化当前状态
+    saveGameState();
 }
 
 // 页面加载完成后执行的初始化函数
 $(function () {
-    bindEvents();            // 绑定事件处理函数
-    initialState(gameState); // 初始化游戏状态
-    render();                // 初始渲染界面
+    bindEvents();                                 // 绑定事件处理函数
+    if(!loadGameState()) initialState(gameState); // 无存档时初始化游戏状态
+    render();                                     // 初始渲染界面
 });
