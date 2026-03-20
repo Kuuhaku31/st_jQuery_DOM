@@ -167,7 +167,7 @@ async function drawOneCard(isForEnemy = false) {
 
     const cardInfo = await getCardInfoFromAPI(); // 从 API 获取卡牌信息（同步）
     if(!cardInfo) {
-        console.error("抽卡失败，请检查网络连接或稍后再试");
+        console.error("カード取得に失敗しました。ネットワーク接続を確認して再試行してください。");
     }
 
     // 如果为电脑抽卡
@@ -180,7 +180,7 @@ async function drawOneCard(isForEnemy = false) {
         gameState.enemyCard.life     = cardInfo.life;
         gameState.enemyCard.maxLife  = cardInfo.maxLife;
 
-        addGameLog(`第 ${gameState.round} 回合：电脑抽到 ${gameState.enemyCard.name}（攻击力 ${gameState.enemyCard.attack}，防御力 ${gameState.enemyCard.defense}，生命值 ${gameState.enemyCard.life}）`);
+        addGameLog(`第 ${gameState.round} ラウンド：相手が ${gameState.enemyCard.name} を引きました（攻撃力 ${gameState.enemyCard.attack}、防御力 ${gameState.enemyCard.defense}、HP ${gameState.enemyCard.life}）`);
     }
 
     // 如果为玩家抽卡
@@ -196,7 +196,7 @@ async function drawOneCard(isForEnemy = false) {
             playerCard.life     = cardInfo.life;
             playerCard.maxLife  = cardInfo.maxLife;
 
-            addGameLog(`抽到卡牌 ${cardInfo.name}（攻击力 ${cardInfo.attack}，防御力 ${cardInfo.defense}，生命值 ${cardInfo.life}）`);
+            addGameLog(`カードを引きました：${cardInfo.name}（攻撃力 ${cardInfo.attack}、防御力 ${cardInfo.defense}、HP ${cardInfo.life}）`);
         }
     }
 
@@ -219,7 +219,7 @@ function bindEvents() {
         for(let i = 0; i < INITIAL_DRAW_COUNT; i++) {
             drawOneCard(false); // 抽取玩家的卡牌
         }
-        addGameLog(`开局抽卡完成，获得 ${gameState.playerCards.length} 张卡牌`);
+        addGameLog(`初期ドロー完了：${gameState.playerCards.length} 枚のカードを獲得しました`);
 
         drawOneCard(true);       // 先抽取一张电脑的卡牌
 
@@ -247,7 +247,7 @@ function bindEvents() {
         setCardLifeById(playerCard.id, newPlayerLife);
         enemyCard.life = newEnemyLife;
 
-        addGameLog(`第 ${gameState.round + 1} 回合：${playerCard.name} 对 ${enemyCard.name} 造成 ${damageToEnemy} 伤害，${enemyCard.name} 对 ${playerCard.name} 造成 ${damageToPlayer} 伤害`);
+        addGameLog(`第 ${gameState.round + 1} ラウンド：${playerCard.name} が ${enemyCard.name} に ${damageToEnemy} ダメージ、${enemyCard.name} が ${playerCard.name} に ${damageToPlayer} ダメージ`);
 
         // 敌方卡牌被击败：重置生命值后归入玩家卡组，并清空敌方战场
         if(enemyDefeated) {
@@ -255,9 +255,9 @@ function bindEvents() {
 
             if(gameState.playerCards.length < PLAYER_CARD_LIMIT) {
                 gameState.playerCards.push(enemyCard);
-                addGameLog(`你击败了 ${enemyCard.name}，获得该卡牌并恢复其生命值`);
+                addGameLog(`${enemyCard.name} を撃破！カードを獲得し、HPを全回復しました`);
             } else {
-                addGameLog(`你击败了 ${enemyCard.name}，但卡牌已达上限，未获得该卡牌`);
+                addGameLog(`${enemyCard.name} を撃破しましたが、カード上限のため獲得できませんでした`);
             }
 
             drawOneCard(true); // 直接抽取一张新的敌方卡牌，保持对战的连续性
@@ -265,11 +265,11 @@ function bindEvents() {
 
         // 玩家出战卡被击败：从玩家卡组移除
         if(playerDefeated) {
-            addGameLog(`你的出战卡牌 ${playerCard.name} 被击败`);
+            addGameLog(`あなたの出撃カード ${playerCard.name} は撃破されました`);
 
             // 玩家没有卡牌
             if(gameState.playerCards.length === 0) {
-                addGameLog("你已没有卡牌，游戏结束");
+                addGameLog("カードがなくなりました。ゲーム終了です");
             }
             // 没有生命值大于0的卡牌了
             // else 
@@ -277,7 +277,7 @@ function bindEvents() {
 
         // 如果双方都没有被击败，输出当前双方卡牌的生命值状态
         if(!enemyDefeated && !playerDefeated) {
-            addGameLog(`对战后存活：我方 ${playerCard.name}（生命值 ${playerCard.life}），敌方 ${enemyCard.name}（生命值 ${enemyCard.life}）`);
+            addGameLog(`戦闘後の生存状況：自分 ${playerCard.name}（HP ${playerCard.life}）、相手 ${enemyCard.name}（HP ${enemyCard.life}）`);
         }
 
         gameState.round++; // 回合数加 1
@@ -294,7 +294,7 @@ function bindEvents() {
 
         // 更新当前选择的出战卡牌 ID，并输出日志信息
         gameState.selectedCardId = cardId;
-        addGameLog(`选择 ${card.name} 出战，攻击力 ${card.attack}`);
+        addGameLog(`${card.name} を出撃に選択しました（攻撃力 ${card.attack}）`);
         render();
     }
 
@@ -307,11 +307,11 @@ function bindEvents() {
 
         // 从玩家的卡牌列表中移除丢弃的卡牌，如果丢弃的卡牌是当前选择的出战卡牌，则取消选择
         removeCardById(cardId);
-        addGameLog(`丢弃卡牌 ${card.name}`);
+        addGameLog(`カードを破棄しました：${card.name}`);
 
         // 如果玩家没有卡牌了，游戏结束
         if(gameState.playerCards.length === 0) {
-            addGameLog("你已没有卡牌，游戏结束");
+            addGameLog("カードがなくなりました。ゲーム終了です");
         }
 
         render();
@@ -348,7 +348,7 @@ function render() {
     function createCardElement(card, showActions, selected) {
 
         // 如果没有卡牌数据，返回一个提示信息
-        if (!card) return $("<p>").text("暂无卡牌");
+        if (!card) return $("<p>").text("カードなし");
 
         // 创建卡牌的根元素，如果需要高亮显示则添加 selected 类
         const cardEl = $("<article>").addClass("card");
@@ -360,9 +360,10 @@ function render() {
         // 创建卡牌内容元素，包括名称和攻击力、防御力、生命值
         const contentEl = $("<div>").addClass("content");
         const nameEl    = $("<p>")  .addClass("name").text(card.name);
-        const metaEl    = $("<p>")  .addClass("meta").html(`攻击力: <strong>${card.attack}</strong>`);
-        metaEl.append(`<br>防御力: <strong>${card.defense}</strong>`);
-        metaEl.append(`<br>生命值: <strong>${card.life}/${card.maxLife}</strong>`);
+        const metaEl    = $("<p>")  .addClass("meta");
+        metaEl.append(`🗡: <strong>${card.attack}</strong>`);
+        metaEl.append(`　🛡: <strong>${card.defense}</strong>`);
+        metaEl.append(`　❤: <strong>${card.life}/${card.maxLife}</strong>`);
 
         // 将名称和攻击力添加到内容元素中
         contentEl.append(nameEl, metaEl);
@@ -370,8 +371,8 @@ function render() {
         // 如果需要显示操作按钮，创建出战和丢弃按钮，并添加到内容元素中
         if(showActions) {
             const actionsEl  = $("<div>")   .addClass("card-actions");
-            const chooseBtn  = $("<button>").addClass("choose-btn")        .data("id", card.id).text("出战");
-            const discardBtn = $("<button>").addClass("discard-btn danger").data("id", card.id).text("丢弃");
+            const chooseBtn  = $("<button>").addClass("choose-btn")        .data("id", card.id).text("出撃");
+            const discardBtn = $("<button>").addClass("discard-btn danger").data("id", card.id).text("破棄");
             actionsEl.append(chooseBtn, discardBtn);
             contentEl.append(actionsEl);
         }
@@ -407,13 +408,13 @@ function render() {
     // 如果玩家没有卡牌了，显示提示信息
     const cardsContainer = $("#player-cards");
     if(gameState.playerCards.length === 0) {
-        cardsContainer.html("<p>没有卡牌了，请重新开始游戏。</p>");
+        cardsContainer.html("<p>カードがありません。ニューゲームを開始してください。</p>");
     }
     // 否则渲染玩家的卡牌列表
     else {
         const displayedCards = getDisplayedPlayerCards(); // 获取根据当前筛选和排序设置后的卡牌列表
 
-        if(displayedCards.length === 0) cardsContainer.html("<p>无可显示卡牌。</p>");
+        if(displayedCards.length === 0) cardsContainer.html("<p>表示できるカードがありません。</p>");
         else {
             cardsContainer.empty(); // 清空当前的卡牌显示
             for(let i = 0; i < displayedCards.length; i++) {
