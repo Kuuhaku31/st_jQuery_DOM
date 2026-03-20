@@ -34,78 +34,76 @@ function removeCardById(cardId) {
     if(gameState.selectedCardId === cardId) gameState.selectedCardId = null; // 如果丢弃的卡牌是当前选择的出战卡牌，则取消选择
 }
 
-// 从 API 获取一张新的卡牌信息
-async function getCardInfoFromAPI() {
-
-    const CAT_API  = "https://api.thecatapi.com/v1/images/search";
-    const USER_API = "https://randomuser.me/api/?results=3&nat=jp";
-
-    // 通用的 fetch JSON 数据函数，带错误处理
-    // async 表示这是一个异步函数，可以使用 await 来等待 Promise 的结果
-    async function fetchJson(url) {
-        const response = await fetch(url);
-        if(!response.ok) {
-            throw new Error(`Request failed: ${response.status}`);
-        }
-        return response.json();
-    }
-
-    // 从猫咪 API 获取一张猫咪图片的 URL
-    async function getCatImageUrl() {
-        const data = await fetchJson(CAT_API);
-        return data[0]?.url || "";
-    }
-
-    // 从随机用户 API 获取一个用户的信息
-    async function getUserInfo() {
-        const data = await fetchJson(USER_API);
-        const user = data.results?.[0];
-        if (!user) {
-            throw new Error("No user data");
-        }
-
-        return {
-            firstName:    user.name.first,             // 用户的名字
-            lastName:     user.name.last,              // 用户的姓氏
-            age:          user.dob.age,                // 用户的年龄
-            streetNumber: user.location.street.number, // 用户住址的街道号码
-        };
-    }
-
-    // 根据猫咪图片 URL 和用户信息创建一张卡牌对象
-    function makeCardInfo(catImageUrl, userInfo) {
-
-        // 计算卡牌的攻击力，基于用户的年龄和街道号码，确保最低攻击力为 10
-        const attack = Math.max(10, (userInfo.age % 50) + (userInfo.streetNumber % 30));
-
-        return {
-            imageUrl: catImageUrl,                                            // 卡牌的图片 URL
-            name:     `${userInfo.firstName} ${userInfo.lastName}`,           // 卡牌的名称
-            attack:   attack,                                                 // 卡牌的攻击力
-        };
-    }
-
-    // 发起两个 API 请求，等待它们都完成后再创建卡牌对象
-    try {
-
-        const catImageUrl = await getCatImageUrl();
-        const userInfo    = await getUserInfo();
-        const newCardInfo = makeCardInfo(catImageUrl, userInfo);
-
-        return newCardInfo;
-    }
-
-    // 如果在获取卡牌信息的过程中发生任何错误
-    catch (error) {
-        console.error("Error fetching card info:", error);
-        return null;
-    }
-}
-
 // 抽卡
 async function drawOneCard(isForEnemy = false) {
 
-    console.log("drawOneCard");
+    // 从 API 获取一张新的卡牌信息
+    async function getCardInfoFromAPI() {
+
+        const CAT_API  = "https://api.thecatapi.com/v1/images/search";
+        const USER_API = "https://randomuser.me/api/?results=3&nat=jp";
+
+        // 通用的 fetch JSON 数据函数，带错误处理
+        // async 表示这是一个异步函数，可以使用 await 来等待 Promise 的结果
+        async function fetchJson(url) {
+            const response = await fetch(url);
+            if(!response.ok) {
+                throw new Error(`Request failed: ${response.status}`);
+            }
+            return response.json();
+        }
+
+        // 从猫咪 API 获取一张猫咪图片的 URL
+        async function getCatImageUrl() {
+            const data = await fetchJson(CAT_API);
+            return data[0]?.url || "";
+        }
+
+        // 从随机用户 API 获取一个用户的信息
+        async function getUserInfo() {
+            const data = await fetchJson(USER_API);
+            const user = data.results?.[0];
+            if (!user) {
+                throw new Error("No user data");
+            }
+
+            return {
+                firstName:    user.name.first,             // 用户的名字
+                lastName:     user.name.last,              // 用户的姓氏
+                age:          user.dob.age,                // 用户的年龄
+                streetNumber: user.location.street.number, // 用户住址的街道号码
+            };
+        }
+
+        // 根据猫咪图片 URL 和用户信息创建一张卡牌对象
+        function makeCardInfo(catImageUrl, userInfo) {
+
+            // 计算卡牌的攻击力，基于用户的年龄和街道号码，确保最低攻击力为 10
+            const attack = Math.max(10, (userInfo.age % 50) + (userInfo.streetNumber % 30));
+
+            return {
+                imageUrl: catImageUrl,                                            // 卡牌的图片 URL
+                name:     `${userInfo.firstName} ${userInfo.lastName}`,           // 卡牌的名称
+                attack:   attack,                                                 // 卡牌的攻击力
+            };
+        }
+
+        // 发起两个 API 请求，等待它们都完成后再创建卡牌对象
+        try {
+
+            const catImageUrl = await getCatImageUrl();
+            const userInfo    = await getUserInfo();
+            const newCardInfo = makeCardInfo(catImageUrl, userInfo);
+
+            return newCardInfo;
+        }
+
+        // 如果在获取卡牌信息的过程中发生任何错误
+        catch (error) {
+            console.error("Error fetching card info:", error);
+            return null;
+        }
+    }
 
     isBusy = true; // 设置正在进行抽卡的状态，禁用相关按钮
 
@@ -160,29 +158,23 @@ async function drawOneCard(isForEnemy = false) {
 function bindEvents() {
 
     // 开始游戏，重置状态并抽取初始卡牌
-    async function startGame() {
-
-        console.log("startGame");
+    function startGame() {
 
         // 重置游戏状态
         initialState(gameState); // 重新获取初始状态对象
         render();
 
         // 同时发起多个抽卡请求，等待所有请求完成后更新玩家的卡牌列表
-        for (let i = 0; i < INITIAL_DRAW_COUNT; i++) {
+        for(let i = 0; i < INITIAL_DRAW_COUNT; i++) {
             drawOneCard(false); // 抽取玩家的卡牌
         }
         addLog(`开局抽卡完成，获得 ${gameState.playerCards.length} 张卡牌`);
     
         render();
-
-        console.log("startGame结束");
     }
 
     // 执行一次对战，比较玩家选择的卡牌和电脑抽取的卡牌，根据结果更新状态和日志
     async function doBattle() {
-
-        console.log("doBattle");
 
         // 获取当前选择的出战卡牌，如果没有选择则提示玩家先选择卡牌
         const playerCard = findCardById(gameState.selectedCardId);
@@ -216,8 +208,6 @@ function bindEvents() {
         }
 
         render();
-
-        console.log("doBattle结束");
     }
 
     // 选择一张卡牌作为出战卡牌，更新状态并输出日志
