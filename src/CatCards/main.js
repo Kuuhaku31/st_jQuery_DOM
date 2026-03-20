@@ -364,7 +364,6 @@ function render() {
 
 // 页面加载完成后执行的初始化函数
 $(function () {
-
     bindEvents();        // 绑定事件处理函数
     initialState(gameState); // 初始化游戏状态
     render();            // 初始渲染界面
