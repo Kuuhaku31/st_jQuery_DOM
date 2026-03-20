@@ -87,11 +87,25 @@ async function getCardInfoFromAPI() {
     }
 
     // 发起两个 API 请求，等待它们都完成后再创建卡牌对象
-    const catImageUrl = await getCatImageUrl();
-    const userInfo    = await getUserInfo();
-    const newCardInfo = makeCardInfo(catImageUrl, userInfo);
+    try {
 
-    return newCardInfo;
+        const catImageUrl = await getCatImageUrl();
+        const userInfo    = await getUserInfo();
+        const newCardInfo = makeCardInfo(catImageUrl, userInfo);
+
+        return newCardInfo;
+    }
+
+    // 如果在获取卡牌信息的过程中发生任何错误
+    catch (error) {
+        console.error("Error fetching card info:", error);
+        // 返回一个默认的卡牌信息对象
+        return {
+            imageUrl: null, // 错误占位图
+            name: "？？？", // 默认名称
+            attack: null,   // 默认攻击力
+        };
+    }
 }
 
 // 抽卡
@@ -112,36 +126,37 @@ async function drawOneCard(isForEnemy = false) {
     if(isForEnemy) state.enemyCard = newCard; // 更新电脑的卡牌状态以显示在界面上
     else state.playerCards.push(newCard); // 将新卡牌添加到玩家的卡牌列表中
 
+    render();
 
-    try {
-        const cardInfo = await getCardInfoFromAPI(); // 从 API 获取卡牌信息
-        
-        if(isForEnemy) {
-            state.enemyCard.imageUrl = cardInfo.imageUrl;
-            state.enemyCard.name     = cardInfo.name;
-            state.enemyCard.attack   = cardInfo.attack;
-        } else {
-            const playerCard = findCardById(newCardID);
-            if (playerCard) {
-                playerCard.imageUrl = cardInfo.imageUrl;
-                playerCard.name     = cardInfo.name;
-                playerCard.attack   = cardInfo.attack;
-            }
-        }
+    const cardInfo = await getCardInfoFromAPI(); // 从 API 获取卡牌信息（同步）
 
-        addLog(`抽到卡牌 ${cardInfo.name}（攻击力 ${cardInfo.attack}）`);
+    // 如果为电脑抽卡
+    if(isForEnemy) {
 
-    } catch (error) {
-        console.error(error);
-        addLog("抽卡失败，请检查网络后重试");
-    } finally {
-        state.isBusy = false; // 无论成功与否都要重置正在进行抽卡的状态
-        render(); // 无论成功与否都要更新界面显示
+        state.enemyCard.imageUrl = cardInfo.imageUrl;
+        state.enemyCard.name     = cardInfo.name;
+        state.enemyCard.attack   = cardInfo.attack;
 
-        console.log("drawOneCard try结束");
+        addLog(`第 ${state.round} 回合：电脑抽到 ${state.enemyCard.name}（攻击力 ${state.enemyCard.attack}）`);
     }
 
-    console.log("drawOneCard结束");
+    // 如果为玩家抽卡
+    else {
+        // 更新玩家卡牌列表中对应卡牌的信息
+        const playerCard = findCardById(newCardID);
+        if(playerCard) {
+
+            playerCard.imageUrl = cardInfo.imageUrl;
+            playerCard.name     = cardInfo.name;
+            playerCard.attack   = cardInfo.attack;
+
+            addLog(`抽到卡牌 ${cardInfo.name}（攻击力 ${cardInfo.attack}）`);
+        }
+    }
+
+    // 抽卡完成后重置状态并更新界面显示
+    state.isBusy = false; // 重置正在进行抽卡的状态
+    render();             // 更新界面显示
 }
 
 // 绑定页面上的按钮和卡牌操作事件，设置相应的事件处理函数
@@ -157,7 +172,7 @@ function bindEvents() {
         render();
 
         // 同时发起多个抽卡请求，等待所有请求完成后更新玩家的卡牌列表
-        for (let i = 0; i < 1; i++) {
+        for (let i = 0; i < INITIAL_DRAW_COUNT; i++) {
             drawOneCard(false); // 抽取玩家的卡牌
         }
         addLog(`开局抽卡完成，获得 ${state.playerCards.length} 张卡牌`);
@@ -170,56 +185,42 @@ function bindEvents() {
     // 执行一次对战，比较玩家选择的卡牌和电脑抽取的卡牌，根据结果更新状态和日志
     async function doBattle() {
 
+        console.log("doBattle");
+
         // 获取当前选择的出战卡牌，如果没有选择则提示玩家先选择卡牌
         const playerCard = findCardById(state.selectedCardId);
 
-        // 设置正在进行对战的状态，禁用相关按钮，并更新界面
-        state.isBusy = true;
+        state.round += 1;        // 回合数加 1
+        await drawOneCard(true); // 抽取电脑的卡牌，等待抽卡完成后再继续对战逻辑
+        const enemy = state.enemyCard; // 获取电脑的卡牌信息
+
+        // 比较玩家的出战卡牌和电脑的卡牌，根据攻击力决定胜负
+        if(playerCard.attack > enemy.attack) {
+            if (state.playerCards.length < PLAYER_CARD_LIMIT) {
+                state.playerCards.push(enemy);
+                addLog(`你赢了，获得电脑卡牌 ${enemy.name}`);
+            } else {
+                addLog("你赢了，但卡牌已达到上限，无法获得新卡牌");
+            }
+        }
+        // 从玩家的卡牌列表中移除当前选择的出战卡牌，并取消选择
+        else if (playerCard.attack < enemy.attack) {
+            removeCardById(state.selectedCardId);
+            addLog(`你输了，失去出战卡牌 ${playerCard.name}`);
+
+            if (state.playerCards.length === 0) {
+                addLog("你已没有卡牌，游戏结束");
+            }
+        }
+        // 平局则双方保留卡牌，并取消选择
+        else {
+            addLog("本回合平局，双方保留卡牌");
+            state.selectedCardId = null;
+        }
+
         render();
 
-        try {
-            state.round += 1;                  // 回合数加 1
-            const enemy = await getCardInfoFromAPI(); // 从 API 获取电脑的卡牌对象
-            state.enemyCard = enemy;           // 更新电脑的卡牌状态以显示在界面上
-
-            addLog(`第 ${state.round} 回合：电脑抽到 ${enemy.name}（攻击力 ${enemy.attack}）`);
-
-            // 比较玩家的出战卡牌和电脑的卡牌，根据攻击力决定胜负
-            if(playerCard.attack > enemy.attack) {
-                if (state.playerCards.length < PLAYER_CARD_LIMIT) {
-                    state.playerCards.push(enemy);
-                    addLog(`你赢了，获得电脑卡牌 ${enemy.name}`);
-                } else {
-                    addLog("你赢了，但卡牌已达到上限，无法获得新卡牌");
-                }
-            }
-            // 从玩家的卡牌列表中移除当前选择的出战卡牌，并取消选择
-            else if (playerCard.attack < enemy.attack) {
-                removeCardById(state.selectedCardId);
-                addLog(`你输了，失去出战卡牌 ${playerCard.name}`);
-
-                if (state.playerCards.length === 0) {
-                    addLog("你已没有卡牌，游戏结束");
-                }
-            }
-            // 平局则双方保留卡牌，并取消选择
-            else {
-                addLog("本回合平局，双方保留卡牌");
-                state.selectedCardId = null;
-            }
-        }
-
-        // 捕获对战过程中可能发生的错误，输出错误信息并提示玩家重试
-        catch (error) {
-            console.error(error);
-            addLog("对局失败，请稍后重试");
-        }
-
-        // 无论对战结果如何，都要重置正在进行对战的状态，并更新界面
-        finally {
-            state.isBusy = false;
-            render();
-        }
+        console.log("doBattle结束");
     }
 
     // 选择一张卡牌作为出战卡牌，更新状态并输出日志
@@ -345,13 +346,13 @@ function render() {
     // 根据 state.log 数组渲染日志
     {
         const logContainer = $("#log");
-        logContainer.empty();
+        logContainer.empty(); // 清空当前日志显示
 
-        const logs = Array.isArray(state.log) ? state.log : [];
-        logs.forEach((item) => {
-            const logItem = $("<li>").text(`[${item.time}] ${item.message}`);
-            logContainer.append(logItem);
-        });
+        for(let i = state.log.length - 1; i >= 0; i--) {
+            const logEntry = state.log[i];
+            const logEl = $("<p>").html(`<span class="timestamp">[${logEntry.time}]</span> ${logEntry.message}`);
+            logContainer.append(logEl);
+        }
     }
 }
 
