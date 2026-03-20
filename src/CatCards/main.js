@@ -22,13 +22,13 @@ function loadGameState() {
     if(!raw) return false;
 
     const savedState = JSON.parse(raw);
-    if(!savedState || typeof savedState !== "object") return false;
+    if(!savedState) return false;
     gameState = savedState;
     return true;
 }
 
 // 获取初始状态对象的函数，返回一个新的状态对象
-function initialState(gameState) {
+function initialState() {
     gameState.cardID         = 0;      // 用于生成唯一卡牌 ID 的计数器
     gameState.playerCards    = [];     // 玩家当前拥有的卡牌列表
     gameState.selectedCardId = null;   // 当前选择的出战卡牌 ID 
@@ -212,7 +212,7 @@ function bindEvents() {
     function restartGame() {
 
         // 重置游戏状态
-        initialState(gameState); // 重新获取初始状态对象
+        initialState(); // 重新获取初始状态对象
         render();
 
         // 同时发起多个抽卡请求，等待所有请求完成后更新玩家的卡牌列表
@@ -439,7 +439,7 @@ function render() {
 
 // 页面加载完成后执行的初始化函数
 $(function () {
-    bindEvents();                                 // 绑定事件处理函数
-    if(!loadGameState()) initialState(gameState); // 无存档时初始化游戏状态
-    render();                                     // 初始渲染界面
+    bindEvents();                        // 绑定事件处理函数
+    if(!loadGameState()) initialState(); // 无存档时初始化游戏状态
+    render();                            // 初始渲染界面
 });
