@@ -24,6 +24,16 @@ body {
 .app {
   max-width: 1100px;
   margin: 0 auto;
+}
+
+.game-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 320px;
+  gap: 16px;
+  align-items: start;
+}
+
+.main-column {
   display: grid;
   gap: 16px;
 }
@@ -48,10 +58,7 @@ body {
 }
 
 .top-meta {
-  display: grid;
-  grid-template-columns: minmax(0, 2fr) minmax(0, 1fr);
-  gap: 10px;
-  align-items: start;
+  display: block;
 }
 
 h1 {
@@ -122,6 +129,10 @@ button:disabled {
   min-height: 100%;
 }
 
+.log-panel h2 {
+  margin: 0 0 10px;
+}
+
 .message-panel h2 {
   margin: 0 0 8px;
   font-size: 1rem;
@@ -168,11 +179,19 @@ button:disabled {
   accent-color: var(--accent);
 }
 
-#game-massage {
+#game-log {
   margin: 0;
   padding-left: 18px;
   color: var(--muted);
   line-height: 1.5;
+  max-height: 520px;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding-right: 6px;
+}
+
+#game-log li {
+  margin-bottom: 6px;
 }
 
 .cards {
@@ -266,6 +285,14 @@ button:disabled {
     padding: 14px;
   }
 
+  .game-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .main-column {
+    gap: 14px;
+  }
+
   .header {
     flex-direction: column;
     align-items: stretch;
@@ -277,10 +304,6 @@ button:disabled {
 
   .actions button {
     flex: 1;
-  }
-
-  .top-meta {
-    grid-template-columns: 1fr;
   }
 
   .section-head {
@@ -303,5 +326,9 @@ button:disabled {
   .battle-vs {
     min-height: 0;
     padding: 2px 0;
+  }
+
+  #game-log {
+    max-height: 220px;
   }
 }

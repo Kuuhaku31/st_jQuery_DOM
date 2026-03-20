@@ -5,6 +5,11 @@ const PLAYER_CARD_LIMIT = 8;
 const gameState = {};    // 游戏状态对象
 let   isBusy    = false; // 是否正在进行异步操作（如抽卡或对战）
 
+// 统一记录游戏日志，集中渲染到日志面板
+function addGameLog(message) {
+    gameState.log.push(message);
+}
+
 // 获取初始状态对象的函数，返回一个新的状态对象
 function initialState(gameState) {
     gameState.cardID         = 0;      // 用于生成唯一卡牌 ID 的计数器
@@ -12,7 +17,7 @@ function initialState(gameState) {
     gameState.selectedCardId = null;   // 当前选择的出战卡牌 ID 
     gameState.enemyCard      = null;   // 电脑当前的卡牌
     gameState.round          = 0;      // 当前回合数
-    gameState.message        = "Cat Cards";     // 游戏消息
+    gameState.log            = [];     // 游戏日志
     gameState.sortBy         = gameState.sortBy || "none"; // 玩家卡牌排序字段
     gameState.sortOrder      = gameState.sortOrder || "desc"; // 玩家卡牌排序方向
     gameState.filterAliveOnly = gameState.filterAliveOnly || false; // 是否仅显示生命值大于0的卡牌
@@ -20,31 +25,26 @@ function initialState(gameState) {
 
 // 根据当前筛选与排序设置返回用于显示的卡牌数组（不修改原数组）
 function getDisplayedPlayerCards() {
-    let cards = [...gameState.playerCards];
+    let cards = gameState.playerCards.slice(); // 创建玩家卡牌列表的副本，避免直接修改原数组
 
-    if(gameState.filterAliveOnly) {
-        cards = cards.filter((card) => Number(card.life) > 0);
-    }
+    // 如果设置了仅显示生命值大于0的卡牌，则进行过滤
+    if(gameState.filterAliveOnly) cards = cards.filter((card) => card.life > 0);
 
+    // 如果没有设置排序字段，则直接返回过滤后的卡牌列表
     if(gameState.sortBy === "none") return cards;
 
+    // 决定排序的方向，升序为 1，降序为 -1
     const orderFactor = gameState.sortOrder === "asc" ? 1 : -1;
 
+    // 根据当前设置的排序字段对卡牌进行排序，未加载完成的卡牌按 0 处理，名称按字典序排序
     cards.sort((a, b) => {
-        const aValue = a?.[gameState.sortBy];
-        const bValue = b?.[gameState.sortBy];
-
-        // 名称按字典序排序
-        if(gameState.sortBy === "name") {
-            const aName = String(aValue || "");
-            const bName = String(bValue || "");
-            return aName.localeCompare(bName, "zh-Hans-CN") * orderFactor;
+        switch(gameState.sortBy) {
+            case "life":    return (a.life    - b.life   ) * orderFactor;
+            case "attack":  return (a.attack  - b.attack ) * orderFactor;
+            case "defense": return (a.defense - b.defense) * orderFactor;
+            case "maxLife": return (a.maxLife - b.maxLife) * orderFactor;
+            default:        return 0;
         }
-
-        // 数值属性排序，未加载完成的卡牌按 0 处理
-        const aNum = Number.isFinite(Number(aValue)) ? Number(aValue) : 0;
-        const bNum = Number.isFinite(Number(bValue)) ? Number(bValue) : 0;
-        return (aNum - bNum) * orderFactor;
     });
 
     return cards;
@@ -172,7 +172,7 @@ async function drawOneCard(isForEnemy = false) {
         gameState.enemyCard.life     = cardInfo.life;
         gameState.enemyCard.maxLife  = cardInfo.maxLife;
 
-        console.log(`第 ${gameState.round} 回合：电脑抽到 ${gameState.enemyCard.name}（攻击力 ${gameState.enemyCard.attack}，防御力 ${gameState.enemyCard.defense}，生命值 ${gameState.enemyCard.life}）`);
+        addGameLog(`第 ${gameState.round} 回合：电脑抽到 ${gameState.enemyCard.name}（攻击力 ${gameState.enemyCard.attack}，防御力 ${gameState.enemyCard.defense}，生命值 ${gameState.enemyCard.life}）`);
     }
 
     // 如果为玩家抽卡
@@ -188,7 +188,7 @@ async function drawOneCard(isForEnemy = false) {
             playerCard.life     = cardInfo.life;
             playerCard.maxLife  = cardInfo.maxLife;
 
-            console.log(`抽到卡牌 ${cardInfo.name}（攻击力 ${cardInfo.attack}，防御力 ${cardInfo.defense}，生命值 ${cardInfo.life}）`);
+            addGameLog(`抽到卡牌 ${cardInfo.name}（攻击力 ${cardInfo.attack}，防御力 ${cardInfo.defense}，生命值 ${cardInfo.life}）`);
         }
     }
 
@@ -211,7 +211,7 @@ function bindEvents() {
         for(let i = 0; i < INITIAL_DRAW_COUNT; i++) {
             drawOneCard(false); // 抽取玩家的卡牌
         }
-        console.log(`开局抽卡完成，获得 ${gameState.playerCards.length} 张卡牌`);
+        addGameLog(`开局抽卡完成，获得 ${gameState.playerCards.length} 张卡牌`);
 
         drawOneCard(true);       // 先抽取一张电脑的卡牌
 
@@ -239,7 +239,7 @@ function bindEvents() {
         setCardLifeById(playerCard.id, newPlayerLife);
         enemyCard.life = newEnemyLife;
 
-        console.log(`第 ${gameState.round + 1} 回合：${playerCard.name} 对 ${enemyCard.name} 造成 ${damageToEnemy} 伤害，${enemyCard.name} 对 ${playerCard.name} 造成 ${damageToPlayer} 伤害`);
+        addGameLog(`第 ${gameState.round + 1} 回合：${playerCard.name} 对 ${enemyCard.name} 造成 ${damageToEnemy} 伤害，${enemyCard.name} 对 ${playerCard.name} 造成 ${damageToPlayer} 伤害`);
 
         // 敌方卡牌被击败：重置生命值后归入玩家卡组，并清空敌方战场
         if(enemyDefeated) {
@@ -247,9 +247,9 @@ function bindEvents() {
 
             if(gameState.playerCards.length < PLAYER_CARD_LIMIT) {
                 gameState.playerCards.push(enemyCard);
-                console.log(`你击败了 ${enemyCard.name}，获得该卡牌并恢复其生命值`);
+                addGameLog(`你击败了 ${enemyCard.name}，获得该卡牌并恢复其生命值`);
             } else {
-                console.log(`你击败了 ${enemyCard.name}，但卡牌已达上限，未获得该卡牌`);
+                addGameLog(`你击败了 ${enemyCard.name}，但卡牌已达上限，未获得该卡牌`);
             }
 
             drawOneCard(true); // 直接抽取一张新的敌方卡牌，保持对战的连续性
@@ -257,11 +257,11 @@ function bindEvents() {
 
         // 玩家出战卡被击败：从玩家卡组移除
         if(playerDefeated) {
-            console.log(`你的出战卡牌 ${playerCard.name} 被击败`);
+            addGameLog(`你的出战卡牌 ${playerCard.name} 被击败`);
 
             // 玩家没有卡牌
             if(gameState.playerCards.length === 0) {
-                console.log("你已没有卡牌，游戏结束");
+                addGameLog("你已没有卡牌，游戏结束");
             }
             // 没有生命值大于0的卡牌了
             // else 
@@ -269,7 +269,7 @@ function bindEvents() {
 
         // 如果双方都没有被击败，输出当前双方卡牌的生命值状态
         if(!enemyDefeated && !playerDefeated) {
-            console.log(`对战后存活：我方 ${playerCard.name}（生命值 ${playerCard.life}），敌方 ${enemyCard.name}（生命值 ${enemyCard.life}）`);
+            addGameLog(`对战后存活：我方 ${playerCard.name}（生命值 ${playerCard.life}），敌方 ${enemyCard.name}（生命值 ${enemyCard.life}）`);
         }
 
         gameState.round++; // 回合数加 1
@@ -286,10 +286,8 @@ function bindEvents() {
 
         // 更新当前选择的出战卡牌 ID，并输出日志信息
         gameState.selectedCardId = cardId;
-        console.log(`选择 ${card.name} 出战，攻击力 ${card.attack}`);
+        addGameLog(`选择 ${card.name} 出战，攻击力 ${card.attack}`);
         render();
-
-        console.log(gameState);
     }
 
     // 丢弃一张卡牌，从玩家的卡牌列表中移除，并更新状态和日志
@@ -301,11 +299,11 @@ function bindEvents() {
 
         // 从玩家的卡牌列表中移除丢弃的卡牌，如果丢弃的卡牌是当前选择的出战卡牌，则取消选择
         removeCardById(cardId);
-        console.log(`丢弃卡牌 ${card.name}`);
+        addGameLog(`丢弃卡牌 ${card.name}`);
 
         // 如果玩家没有卡牌了，游戏结束
         if(gameState.playerCards.length === 0) {
-            console.log("你已没有卡牌，游戏结束");
+            addGameLog("你已没有卡牌，游戏结束");
         }
 
         render();
@@ -388,7 +386,13 @@ function render() {
         $("#sort-order").val(gameState.sortOrder);
         $("#filter-alive").prop("checked", gameState.filterAliveOnly);
 
-        $("#game-massage").text(gameState.message);
+        // 渲染游戏日志，最新的日志显示在最上面
+        const gameLogEl = $("#game-log");
+        gameLogEl.empty();
+        for(let i = gameState.log.length - 1; i >= 0; i--) {
+            const item = gameState.log[i];
+            gameLogEl.append($("<li>").text(item));
+        }
     }
 
     // 渲染手牌区
@@ -399,17 +403,16 @@ function render() {
     }
     // 否则渲染玩家的卡牌列表
     else {
-        const displayedCards = getDisplayedPlayerCards();
+        const displayedCards = getDisplayedPlayerCards(); // 获取根据当前筛选和排序设置后的卡牌列表
 
-        if(displayedCards.length === 0) {
-            cardsContainer.html("<p>筛选后无可显示卡牌。</p>");
-            return;
-        }
-
-        cardsContainer.empty(); // 清空当前的卡牌显示
-        for(const card of displayedCards) {
-            const cardEl = createCardElement(card, true, card.id === gameState.selectedCardId);
-            cardsContainer.append(cardEl);
+        if(displayedCards.length === 0) cardsContainer.html("<p>无可显示卡牌。</p>");
+        else {
+            cardsContainer.empty(); // 清空当前的卡牌显示
+            for(let i = 0; i < displayedCards.length; i++) {
+                const card   = displayedCards[i];
+                const cardEl = createCardElement(card, true, card.id === gameState.selectedCardId);
+                cardsContainer.append(cardEl);
+            }
         }
     }
 
