@@ -91,6 +91,11 @@ async function getCardInfoFromAPI() {
         const catImageUrl = await getCatImageUrl();
         const userInfo    = await getUserInfo();
         const newCardInfo = makeCardInfo(catImageUrl, userInfo);
+    try {
+
+        const catImageUrl = await getCatImageUrl();
+        const userInfo    = await getUserInfo();
+        const newCardInfo = makeCardInfo(catImageUrl, userInfo);
 
         return newCardInfo;
     }
@@ -170,6 +175,7 @@ function bindEvents() {
 
         // 同时发起多个抽卡请求，等待所有请求完成后更新玩家的卡牌列表
         for (let i = 0; i < INITIAL_DRAW_COUNT; i++) {
+        for (let i = 0; i < INITIAL_DRAW_COUNT; i++) {
             drawOneCard(false); // 抽取玩家的卡牌
         }
         addLog(`开局抽卡完成，获得 ${gameState.playerCards.length} 张卡牌`);
@@ -181,6 +187,8 @@ function bindEvents() {
 
     // 执行一次对战，比较玩家选择的卡牌和电脑抽取的卡牌，根据结果更新状态和日志
     async function doBattle() {
+
+        console.log("doBattle");
 
         console.log("doBattle");
 
@@ -343,6 +351,7 @@ function render() {
     // 根据 state.log 数组渲染日志
     {
         const logContainer = $("#log");
+        logContainer.empty(); // 清空当前日志显示
         logContainer.empty(); // 清空当前日志显示
 
         for(let i = gameState.log.length - 1; i >= 0; i--) {
