@@ -22,8 +22,18 @@ body {
 }
 
 .app {
-  max-width: 1100px;
+  max-width: 1240px;
   margin: 0 auto;
+}
+
+.game-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 280px;
+  gap: 16px;
+  align-items: start;
+}
+
+.main-column {
   display: grid;
   gap: 16px;
 }
@@ -40,6 +50,15 @@ body {
   justify-content: space-between;
   align-items: center;
   gap: 10px;
+}
+
+.top-overview {
+  display: grid;
+  gap: 12px;
+}
+
+.top-meta {
+  display: block;
 }
 
 h1 {
@@ -81,6 +100,10 @@ button:disabled {
   gap: 10px;
 }
 
+.compact-status {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
 .status-item {
   background: var(--bg);
   border: 1px solid #ebf0f5;
@@ -96,6 +119,79 @@ button:disabled {
 .status-item .value {
   font-size: 1.1rem;
   font-weight: 700;
+}
+
+.message-panel {
+  background: var(--bg);
+  border: 1px solid #ebf0f5;
+  border-radius: 10px;
+  padding: 10px;
+  min-height: 100%;
+}
+
+.log-panel h2 {
+  margin: 0 0 10px;
+}
+
+.message-panel h2 {
+  margin: 0 0 8px;
+  font-size: 1rem;
+}
+
+.section-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.section-head h2 {
+  margin: 0;
+}
+
+.sort-controls {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+
+.sort-controls select {
+  border: 1px solid #d8e1ed;
+  border-radius: 8px;
+  padding: 5px 8px;
+  background: #fff;
+  color: var(--text);
+}
+
+.filter-alive {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-left: 4px;
+  color: var(--text);
+}
+
+.filter-alive input {
+  margin: 0;
+  accent-color: var(--accent);
+}
+
+#game-log {
+  margin: 0;
+  padding-left: 18px;
+  color: var(--muted);
+  line-height: 1.5;
+  max-height: 520px;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding-right: 6px;
+}
+
+#game-log li {
+  margin-bottom: 6px;
 }
 
 .cards {
@@ -146,8 +242,30 @@ button:disabled {
 
 #battle-area {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: minmax(0, 1fr) 90px minmax(0, 1fr);
+  align-items: start;
   gap: 12px;
+}
+
+#battle-area h2 {
+  margin: 0 0 10px;
+}
+
+.battle-side {
+  min-width: 0;
+}
+
+.battle-vs {
+  display: grid;
+  place-items: center;
+  align-self: stretch;
+}
+
+.battle-vs h2 {
+  margin: 0;
+  font-size: 1.6rem;
+  letter-spacing: 0.08em;
+  color: var(--muted);
 }
 
 #log {
@@ -167,11 +285,50 @@ button:disabled {
     padding: 14px;
   }
 
+  .game-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .main-column {
+    gap: 14px;
+  }
+
+  .header {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .actions {
+    width: 100%;
+  }
+
+  .actions button {
+    flex: 1;
+  }
+
+  .section-head {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .sort-controls {
+    flex-wrap: wrap;
+  }
+
   .status-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
   #battle-area {
     grid-template-columns: 1fr;
+  }
+
+  .battle-vs {
+    min-height: 0;
+    padding: 2px 0;
+  }
+
+  #game-log {
+    max-height: 220px;
   }
 }

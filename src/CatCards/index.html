@@ -1,59 +1,91 @@
 <!doctype html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Cat Cards</title>
-    <link rel="stylesheet" href="style.css" />
-  </head>
-  <body>
-    <main class="app">
-      <section class="panel header">
-        <h1>随机猫咪卡片大战</h1>
-        <div class="actions">
-          <button id="start-game">开始游戏</button>
-          <button id="battle-btn" class="secondary" disabled>开始对局</button>
-        </div>
-      </section>
+<html lang="ja">
 
-      <section class="panel status-grid">
-        <div class="status-item">
-          <div class="label">回合</div>
-          <div id="round-text" class="value">0</div>
-        </div>
-        <div class="status-item">
-          <div class="label">玩家卡牌数</div>
-          <div id="card-count" class="value">0</div>
-        </div>
-        <div class="status-item">
-          <div class="label">卡牌上限</div>
-          <div id="card-limit" class="value">8</div>
-        </div>
-      </section>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ネコ戦争</title>
+  <link rel="stylesheet" href="./style.css" />
+</head>
 
-      <section class="panel">
-        <h2>玩家卡组</h2>
-        <div id="player-cards" class="cards"></div>
-      </section>
+<body>
+  <main class="app">
+    <div class="game-layout">
+      <div class="main-column">
+        <section class="panel top-overview">
+          <div class="header">
+            <h1>ネコ戦争</h1>
+            <div class="actions">
+              <button id="restart-game">ニューゲーム</button>
+            </div>
+          </div>
 
-      <section id="battle-area" class="panel">
-        <div>
-          <h2>我方出战卡</h2>
-          <div id="selected-card"></div>
-        </div>
-        <div>
-          <h2>电脑卡牌</h2>
-          <div id="enemy-card"></div>
-        </div>
-      </section>
+          <div class="top-meta">
+            <div class="status-grid compact-status">
+              <div class="status-item">
+                <div class="label">ラウンド</div>
+                <div id="round-text" class="value"></div>
+              </div>
+              <div class="status-item">
+                <div class="label">プレイヤーカード数</div>
+                <div id="card-count" class="value"></div>
+              </div>
+            </div>
+          </div>
+        </section>
 
-      <section class="panel">
-        <h2>对战日志</h2>
-        <ul id="log"></ul>
-      </section>
-    </main>
+        <section id="battle-area" class="panel">
+          <div class="battle-side">
+            <h2>自分の出撃カード</h2>
+            <div id="selected-card"></div>
+          </div>
+          <div class="battle-vs" aria-label="対戦表示">
+            <h2>VS</h2>
+          </div>
+          <div class="battle-side">
+            <h2>相手カード</h2>
+            <div id="enemy-card"></div>
+          </div>
+        </section>
+        <button id="battle-btn" class="secondary" disabled>バトル開始</button>
+        <section class="panel">
+          <div class="section-head">
+            <h2>プレイヤーデッキ</h2>
+            <div class="sort-controls" aria-label="カード並び替え設定">
+              <label for="sort-by">並び替え項目</label>
+              <select id="sort-by">
+                <option value="none">デフォルト順</option>
+                <option value="life">HP</option>
+                <option value="attack">攻撃力</option>
+                <option value="defense">防御力</option>
+                <option value="maxLife">最大HP</option>
+              </select>
 
-    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
-    <script src="./main.js"></script>
-  </body>
+              <label for="sort-order">順序</label>
+              <select id="sort-order">
+                <option value="desc">降順</option>
+                <option value="asc">昇順</option>
+              </select>
+
+              <label class="filter-alive" for="filter-alive">
+                <input id="filter-alive" type="checkbox" />
+                HPが0より大きいカードのみ表示
+              </label>
+            </div>
+          </div>
+          <div id="player-cards" class="cards"></div>
+        </section>
+      </div>
+
+      <section class="panel log-panel" aria-label="ゲームログ">
+        <h2>ゲームログ</h2>
+        <ul id="game-log"></ul>
+      </section>
+    </div>
+  </main>
+
+  <script src="https://code.jquery.com/jquery-4.0.0.min.js"></script>
+  <script src="./main.js"></script>
+</body>
+
 </html>
