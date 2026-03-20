@@ -36,7 +36,7 @@ function removeCardById(cardId) {
 }
 
 // 从 API 获取一张新的卡牌信息
-async function drawOneCard() {
+async function getCardInfoFromAPI() {
 
     const CAT_API  = "https://api.thecatapi.com/v1/images/search";
     const USER_API = "https://randomuser.me/api/?results=3&nat=jp";
@@ -74,31 +74,74 @@ async function drawOneCard() {
     }
 
     // 根据猫咪图片 URL 和用户信息创建一张卡牌对象
-    function makeCard(catImageUrl, userInfo) {
+    function makeCardInfo(catImageUrl, userInfo) {
 
         // 计算卡牌的攻击力，基于用户的年龄和街道号码，确保最低攻击力为 10
         const attack = Math.max(10, (userInfo.age % 50) + (userInfo.streetNumber % 30));
 
-        // 使用计数器生成卡牌 ID，保证同一局内递增唯一
-        if (typeof state.cardID !== "number") {
-            state.cardID = 0;
-        }
-        state.cardID += 1;
-
         return {
-            id:       `card-${state.cardID}`, // 通过计数器生成唯一卡牌 ID
             imageUrl: catImageUrl,                                            // 卡牌的图片 URL
             name:     `${userInfo.firstName} ${userInfo.lastName}`,           // 卡牌的名称
-            attack,                                                           // 卡牌的攻击力
+            attack:   attack,                                                 // 卡牌的攻击力
         };
     }
 
     // 发起两个 API 请求，等待它们都完成后再创建卡牌对象
     const catImageUrl = await getCatImageUrl();
     const userInfo    = await getUserInfo();
-    const newCard     = makeCard(catImageUrl, userInfo);
+    const newCardInfo = makeCardInfo(catImageUrl, userInfo);
 
-    return newCard;
+    return newCardInfo;
+}
+
+// 抽卡
+async function drawOneCard(isForEnemy = false) {
+
+    console.log("drawOneCard");
+
+    state.isBusy = true; // 设置正在进行抽卡的状态，禁用相关按钮
+
+    const newCardID = `card-${state.cardID++}`; // 生成新的卡牌 ID
+    const newCard = {
+        id:       newCardID, // 使用生成的卡牌 ID
+        imageUrl: null,
+        name:     null,
+        attack:   null,
+    };
+
+    if(isForEnemy) state.enemyCard = newCard; // 更新电脑的卡牌状态以显示在界面上
+    else state.playerCards.push(newCard); // 将新卡牌添加到玩家的卡牌列表中
+
+
+    try {
+        const cardInfo = await getCardInfoFromAPI(); // 从 API 获取卡牌信息
+        
+        if(isForEnemy) {
+            state.enemyCard.imageUrl = cardInfo.imageUrl;
+            state.enemyCard.name     = cardInfo.name;
+            state.enemyCard.attack   = cardInfo.attack;
+        } else {
+            const playerCard = findCardById(newCardID);
+            if (playerCard) {
+                playerCard.imageUrl = cardInfo.imageUrl;
+                playerCard.name     = cardInfo.name;
+                playerCard.attack   = cardInfo.attack;
+            }
+        }
+
+        addLog(`抽到卡牌 ${cardInfo.name}（攻击力 ${cardInfo.attack}）`);
+
+    } catch (error) {
+        console.error(error);
+        addLog("抽卡失败，请检查网络后重试");
+    } finally {
+        state.isBusy = false; // 无论成功与否都要重置正在进行抽卡的状态
+        render(); // 无论成功与否都要更新界面显示
+
+        console.log("drawOneCard try结束");
+    }
+
+    console.log("drawOneCard结束");
 }
 
 // 绑定页面上的按钮和卡牌操作事件，设置相应的事件处理函数
@@ -107,24 +150,21 @@ function bindEvents() {
     // 开始游戏，重置状态并抽取初始卡牌
     async function startGame() {
 
+        console.log("startGame");
+
         // 重置游戏状态
         initialState(state); // 重新获取初始状态对象
-        state.isBusy = true;
         render();
 
         // 同时发起多个抽卡请求，等待所有请求完成后更新玩家的卡牌列表
-        try {
-            const tasks = Array.from({ length: INITIAL_DRAW_COUNT }, () => drawOneCard()); // 创建一个包含多个抽卡任务的数组
-            const cards = await Promise.all(tasks); // 等待所有抽卡任务完成，得到一个包含多张卡牌的数组
-            state.playerCards = cards; // 将抽取到的卡牌添加到玩家的卡牌列表中
-            addLog(`开局抽卡完成，获得 ${cards.length} 张卡牌`);
-        } catch (error) {
-            console.error(error);
-            addLog("开局抽卡失败，请检查网络后重试");
-        } finally {
-            state.isBusy = false;
-            render();
+        for (let i = 0; i < 1; i++) {
+            drawOneCard(false); // 抽取玩家的卡牌
         }
+        addLog(`开局抽卡完成，获得 ${state.playerCards.length} 张卡牌`);
+    
+        render();
+
+        console.log("startGame结束");
     }
 
     // 执行一次对战，比较玩家选择的卡牌和电脑抽取的卡牌，根据结果更新状态和日志
@@ -139,7 +179,7 @@ function bindEvents() {
 
         try {
             state.round += 1;                  // 回合数加 1
-            const enemy = await drawOneCard(); // 从 API 获取电脑的卡牌对象
+            const enemy = await getCardInfoFromAPI(); // 从 API 获取电脑的卡牌对象
             state.enemyCard = enemy;           // 更新电脑的卡牌状态以显示在界面上
 
             addLog(`第 ${state.round} 回合：电脑抽到 ${enemy.name}（攻击力 ${enemy.attack}）`);
