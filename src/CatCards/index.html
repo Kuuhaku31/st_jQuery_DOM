@@ -10,32 +10,31 @@
 
 <body>
   <main class="app">
-    <section class="panel header">
-      <h1>随机猫咪卡片大战</h1>
-      <div class="actions">
-        <button id="restart-game">新游戏</button>
-        <button id="battle-btn" class="secondary" disabled>开始对局</button>
+    <section class="panel top-overview">
+      <div class="header">
+        <h1>随机猫咪卡片大战</h1>
+        <div class="actions">
+          <button id="restart-game">New Game</button>
+        </div>
       </div>
-    </section>
 
-    <section class="panel status-grid">
-      <div class="status-item">
-        <div class="label">回合</div>
-        <div id="round-text" class="value">0</div>
-      </div>
-      <div class="status-item">
-        <div class="label">玩家卡牌数</div>
-        <div id="card-count" class="value">0</div>
-      </div>
-      <div class="status-item">
-        <div class="label">卡牌上限</div>
-        <div id="card-limit" class="value">8</div>
-      </div>
-    </section>
+      <div class="top-meta">
+        <div class="status-grid compact-status">
+          <div class="status-item">
+            <div class="label">回合</div>
+            <div id="round-text" class="value"></div>
+          </div>
+          <div class="status-item">
+            <div class="label">玩家卡牌数</div>
+            <div id="card-count" class="value"></div>
+          </div>
+        </div>
 
-    <section class="panel">
-      <h2>游戏消息</h2>
-      <ul id="game-massage"></ul>
+        <section class="message-panel" aria-label="游戏消息">
+          <h2>游戏消息</h2>
+          <div id="game-massage"></div>
+        </section>
+      </div>
     </section>
 
     <section id="battle-area" class="panel">
@@ -51,10 +50,33 @@
         <div id="enemy-card"></div>
       </div>
     </section>
-
-
+    <button id="battle-btn" class="secondary" disabled>开始对局</button>
     <section class="panel">
-      <h2>玩家卡组</h2>
+      <div class="section-head">
+        <h2>玩家卡组</h2>
+        <div class="sort-controls" aria-label="卡牌排序设置">
+          <label for="sort-by">排序属性</label>
+          <select id="sort-by">
+            <option value="none">默认顺序</option>
+            <option value="life">生命值</option>
+            <option value="attack">攻击力</option>
+            <option value="defense">防御力</option>
+            <option value="maxLife">最大生命值</option>
+            <option value="name">名称</option>
+          </select>
+
+          <label for="sort-order">顺序</label>
+          <select id="sort-order">
+            <option value="desc">降序</option>
+            <option value="asc">升序</option>
+          </select>
+
+          <label class="filter-alive" for="filter-alive">
+            <input id="filter-alive" type="checkbox" />
+            仅显示生命值 &gt; 0
+          </label>
+        </div>
+      </div>
       <div id="player-cards" class="cards"></div>
     </section>
   </main>
