@@ -146,8 +146,29 @@ button:disabled {
 
 #battle-area {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: minmax(0, 1fr) 90px minmax(0, 1fr);
+  align-items: start;
   gap: 12px;
+}
+
+#battle-area h2 {
+  margin: 0 0 10px;
+}
+
+.battle-side {
+  min-width: 0;
+}
+
+.battle-vs {
+  display: grid;
+  place-items: center;
+}
+
+.battle-vs h2 {
+  margin: 0;
+  font-size: 1.6rem;
+  letter-spacing: 0.08em;
+  color: var(--muted);
 }
 
 #log {
@@ -173,5 +194,10 @@ button:disabled {
 
   #battle-area {
     grid-template-columns: 1fr;
+  }
+
+  .battle-vs {
+    min-height: 0;
+    padding: 2px 0;
   }
 }
